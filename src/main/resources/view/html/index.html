@@ -1,0 +1,122 @@
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lingualeo</title>
+<link rel="stylesheet" type="text/css" href="../css/main.css">
+<script type="text/javascript" charset="UTF-8" src="../js/main.js"></script>
+</head>
+<body>
+<div class="main_block">
+    <div class="header">
+        <a href="http://www.lingualeo.com/ru" id="goto_lingualeo"><img class="logo_img" src="../images/logo-img.svg" /></a>
+        
+        
+        <div id="button_analyze">
+            Проанализировать
+        </div>
+        
+        <div class="header_right">
+            <img class="profile_logo_img" src="../images/logo_blue.png" onclick="showWelcomeScreen();"/>
+            <div class="dictionary">
+                <img src="../images/dict.svg" style="height: 20px;" />
+                <b>Словарь</b>
+            </div>
+        </div>
+    </div>
+
+	<div class="main_frame">
+		<div id="welcome_screen">
+			<div class="profile_info" id="profile_info" style="display: none;">
+                <div class="profile_img_holder">
+                    <img class="profile_img" src="../images/avatar_default.png" />
+                </div>
+                <div class="profile_info_holder">
+	                <div class="profile_nickname"></div>
+	                <div class="profile_lvl">0</div>
+	                <div class="profile_words">
+		                <div class="profile_words_name">Словарный запас:</div>
+		                <div class="profile_words_value" id="profile_words_known">0</div>
+		                </br>
+		                <div class="profile_words_name">Слов в словаре:</div>
+                        <div class="profile_words_value" id="profile_words_cnt">0</div>
+		            </div>
+		            <div class="profile_satiety_state">Сытость <span id="profile_satiety_percent">0</span>%</div>
+		            <div class="profile_satiety_bar">
+                        <div class="profile_satiety_progress"></div>
+		            </div>
+	            </div>
+			</div>
+			
+			<div class="auth" id="auth">
+				<form id="auth_form" onsubmit="return false;">
+					<input class="auth_email" id="a_email" type="text" placeholder="Email" />
+					<input class="auth_password" id="a_password" type="password" placeholder="Пароль" />
+					<button class="auth_button" id="a_button_login" onclick="loginLoading();">ВОЙТИ</button>
+				</form>
+			     
+                <div id="auth_loading" style="display: none;">
+                    <div class="loading_helper" id="auth_loading_helper"></div>
+                    <img class="loading_img" id="auth_loading_img" src="../images/loading.gif" />
+                </div>
+			</div>
+            </br>
+			
+			Добро пожаловать в систему анализа электронных книг,
+			с помощью которой вы сможете выявить наиболее часто встречающиеся в книге
+			слова и добавить их на изучение в замечательную систему изучения английского языка
+			lingualeo.ru.
+			<br/><br/>
+			Для анализа книг необходимо иметь учетную запись в lingualeo.ru.
+			Чтобы зарегистрироваться, можно перейти по ссылке 
+			<a href="http://lingualeo.ru">lingualeo.ru</a>.
+			<br/><br/>
+		</div>		
+		<div id="words_loading" style="display: none;">
+			<div class="loading_helper" id="words_loading_helper"></div>
+			<img class="loading_img" id="words_loading_img" src="../images/loading.gif" />
+		</div>
+		
+        <div class="words" id="words" style="display: none">
+            <div class="words_toolbar">
+                <div class="words_checkbox words_checkbox_unchecked" id="words_checkall" onclick="allWords();"></div>
+                <button class="words_button_add" id="words_button_add" onclick="selectedWords();">
+                	<span class="words_button_add_img"></span>
+                	<span class="words_button_add_text">В словарь</span>
+                </button>
+                <div class="words_frequency_chooser"></div>
+            </div>
+            <div class="words_list" id="words_list">
+	            <div class="words_word">
+	            	<div class="words_word_checkbox_area">
+	                	<div class="words_word_checkbox words_word_checkbox_unchecked" id="wc_1" 
+	                			onclick="selectWord(this);"></div>
+	                </div>
+	                <div class="words_word_frequency">700</div>
+	                <div class="words_word_translate">deliverance</div>
+	                <div class="words_word_context"><span>Deliverance!</span></div>
+	            </div>
+	            
+	            <div class="words_word">
+	            	<div class="words_word_checkbox_area">
+	                	<div class="words_word_checkbox words_word_checkbox_unchecked" id="wc_2" 
+	                			onclick="selectWord(this);"></div>
+	                </div>
+	                <div class="words_word_frequency">700</div>
+	                <div class="words_word_translate">transparent</div>
+	                <div class="words_word_context">Transparent css property is very usefull.</div>
+	            </div>
+	        </div>
+			<div class="paginator" id="words_paginator">
+				<div class="paginator_control_button" id="words_paginator_previous"><</div>
+                <div class="paginator_pages" id="words_paginator_pages">
+                    page: <input class="paginator_page" id="words_paginator_pages_page" type="text" />
+                    / <span class="paginator_pages_amount" id="words_paginator_pages_amount"></span>
+                    <div class="paginator_control_button" id="words_paginator_go">go</div>
+                </div>
+				<div class="paginator_control_button" id="words_paginator_next">></div>
+			</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
