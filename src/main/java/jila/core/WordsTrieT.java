@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Modified trie. Works only with Word2 objects.
+ * Modified trie. Works only with Word objects.
  * Implements map only for compatibility reasons.
  */
 public class WordsTrieT implements Map {
@@ -14,7 +14,7 @@ public class WordsTrieT implements Map {
     public static boolean LOGGING = true;
     protected char c = '\u0000';                        // character
     protected WordsTrieT left, mid, right;  // left, middle, and right subtries
-    protected Word2 word;
+    protected Word word;
     
     /**
      * Constructors
@@ -25,7 +25,7 @@ public class WordsTrieT implements Map {
         COUNT++;
     }
     
-    public WordsTrieT(char ch, Word2 word, String letter, String pre) {
+    public WordsTrieT(char ch, Word word, String letter, String pre) {
         if (word == null || letter == null 
                 || ch == '\u0000') {
             return;
@@ -42,7 +42,7 @@ public class WordsTrieT implements Map {
      * levenshtein distance <= 3 will be considered as the same.
      * @param word
      */
-    public void add(Word2 word) {
+    public void add(Word word) {
         char st = word.getWord().charAt(0);
         WordsTrieT tree;
         
@@ -79,7 +79,7 @@ public class WordsTrieT implements Map {
      * @param letter    - current ending of the word
      * @param pre       - prefix (path of letters, which were visited)
      */
-    protected void add(Word2 word, String letter, String pre) {
+    protected void add(Word word, String letter, String pre) {
         if (LOGGING) {
             System.out.println("add(" 
                     + word + ", " + letter + ", " + pre + ")");
@@ -120,7 +120,7 @@ public class WordsTrieT implements Map {
                         this.word.setCount(this.word.getCount() + 1);
                         
                     } else {
-                        Word2 w = this.word;
+                        Word w = this.word;
                         this.word = word;
                         if (LOGGING) {
                             System.out.println(c + " -> the word saved");
@@ -222,7 +222,7 @@ public class WordsTrieT implements Map {
         // word that we are searching for, than do nothing
         if (this.word != null && !pre.equals(this.word.getWord()) 
                 && !this.word.getWord().equals(word.getWord())) {
-            Word2 w = this.word;
+            Word w = this.word;
             if (letter.length() == 0) {
                 this.word = word;
             } else {
@@ -247,7 +247,7 @@ public class WordsTrieT implements Map {
      * @param word
      * @return
      */
-    public Word2 get(String word) {
+    public Word get(String word) {
         if (LOGGING) {
             System.out.println("get(" + word + ")");
         }
@@ -292,13 +292,13 @@ public class WordsTrieT implements Map {
     
     @Override
     /**
-     * Returns Collection of Word objects,
+     * Returns Collection of AbstractWord objects,
      * which are inside the WordsTrie
      */
-    public Collection<Word> values() {
+    public Collection<AbstractWord> values() {
         //System.out.println("Amount of nodes: " + WordsTrieT.COUNT);
         
-        Collection<Word> result = new ArrayList<>();
+        Collection<AbstractWord> result = new ArrayList<>();
         if (word != null) {
             result.add(word);
         }
@@ -316,26 +316,26 @@ public class WordsTrieT implements Map {
     }
     
 /*    *//**
-     * Returns Word array, made from elements
+     * Returns AbstractWord array, made from elements
      * inside the WordsTrie
      * @return
      *//*
-    public Word[] toArray() {
-        Collection<Word> list = values();
-        Word[] res = new Word[list.size()];
+    public AbstractWord[] toArray() {
+        Collection<AbstractWord> list = values();
+        AbstractWord[] res = new AbstractWord[list.size()];
         res = list.toArray(res);
         return res;
     }*/
     
     /**
      * Returns levenshtein distance of postfixies' of
-     * two Word2 objects. Returns 100, if the words are
+     * two Word objects. Returns 100, if the words are
      * absolutely different (have different roots)
      * @param word1
      * @param word2
      * @return
      */
-    protected static int dist(Word2 word1, Word2 word2) {
+    protected static int dist(Word word1, Word word2) {
         final int L = 3; // the length of the postfix
         String w1 = word1.getWord();
         String w2 = word2.getWord();
@@ -367,17 +367,17 @@ public class WordsTrieT implements Map {
         String w2 = "task";
         String w3 = "unity";        
         
-        tree.add(new Word2(w1));
+        tree.add(new Word(w1));
         
-        tree.add(new Word2(w2));
-        tree.add(new Word2(w3));
-        /*tree.add(new Word2("table"));*/
+        tree.add(new Word(w2));
+        tree.add(new Word(w3));
+        /*tree.add(new Word("table"));*/
         /*System.out.println(tree.contains("test"));*/
         /*System.out.println(tree.contains("word"));
         System.out.println(tree.get("word"));*/
         
         
-        /*tree.add(new Word2("tess"));*/
+        /*tree.add(new Word("tess"));*/
         
         System.out.println("Size: " + tree.values().size());
         

@@ -1,134 +1,77 @@
 package jila.core;
 
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Map.Entry;
+/**
+ * The concrete implementation of AbstractWord class.
+ * The context is implemented as an array of Word objects.
+ */
+public class Word extends AbstractWord {
+    /**
+     * The context is stored as an array of Word objects.
+     * The order of the words in the array is the same as
+     * the order in the original sentence.
+     */
+    private Word[] context = null;
 
-import javax.json.Json;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-
-public abstract class Word implements Comparable<Word>, Jsonable {
-    protected String word = "";
-    protected String translate = "";
-    protected boolean known = false;
-    protected long count = 1;
-    
-    //Constructors
+    /**
+     * The default constructor.
+     */
     public Word() {
-        
     }
-    
+
+    /**
+     * Creates the word entity by its string value.
+     * @param word  string representation of the word
+     */
     public Word(final String word) {
-        this.word = word.toLowerCase();
+        super(word);
     }
-    
+
+    /**
+     * Creates the word entity by its string value and translation.
+     * @param word  string representation of the word
+     * @param translate the translation of the word
+     */
     public Word(final String word, final String translate) {
-        this(word);
-        setTranslate(translate);
-    }
-    
-    
-    //Getters
-    public String getWord() {
-        return word;
-    }
-    
-    public String getTranslate() {
-        return translate;
-    }
-    
-    public abstract String getContext();
-    
-    public boolean isKnown() {
-        return known;
-    }
-    
-    public long getCount() {
-        return count;
-    }
-    
-    
-    //Setters
-    public void setTranslate(final String translate) {
-        this.translate = translate;
-    }
-    
-    public abstract void setContext(final String context);
-    
-    public void setKnown(final boolean known) {
-        this.known = known;
-    }
-    
-    public void setCount(final long newCount) {
-        count = newCount;
-    }
-    
-
-    //Overridden methods
-    @Override
-    public String toString() {
-        return word;
+        super(word, translate);
     }
 
-    @Override
-    public int compareTo(final Word that) {
-        return word.compareTo(that.word);
-    }
-    
-    @Override
-    public boolean equals(final Object o) {
-        if (!(o instanceof Word)) {
-            return false;
-        }
-        Word that = (Word) o;
-        if (word.equals(that.word) && count == that.count) {
-            return true;
-        }
-        return false;
+    /**
+     * Returns the context in the form, in which it is stored -
+     * array of Word objects. The method returns the reference
+     * to the field of the Word object, so the sentence can be
+     * manipulated directly.
+     * @return  the reference to the context field of the Word object
+     */
+    public Word[] getContextArray() {
+        return context;
     }
 
+    /**
+     * Returns the context (the sentence, where the word
+     * has been used) as a string object.
+     * @return
+     */
     @Override
-    public JsonObject toJsonObject() {
-        return toJsonObject(null);
-    }
-    
-    @Override
-    public JsonObject toJsonObject(Map<String, String> attributes) {
-        JsonBuilderFactory factory = Json.createBuilderFactory(null);
-        JsonObjectBuilder builder = factory.createObjectBuilder();
+    public String getContext() {
+        StringBuilder sb = new StringBuilder();
 
-        builder.add("word", getWord());
-        builder.add("translate", getTranslate());
-        builder.add("context", getContext());
-        builder.add("known", isKnown());
-        builder.add("count", getCount());
-        
-        if (attributes != null) {
-            for (Entry<String, String> entry : attributes.entrySet()) {
-                builder.add(entry.getKey(), entry.getValue());
+        for (int i = 0; i < context.length; i++) {
+            String w = context[i].getWord();
+            if (i == 0) {
+                w = Character.toUpperCase(w.charAt(0)) + w.substring(1);
             }
+            sb.append(w + " ");
         }
-        
-        return builder.build();
+
+        return sb.toString();
     }
-    
-    
-    //Methods
-    public static Comparator<Word> countOrder() {
-        return new CountComparator();
-    }
-    
-    
-    //Classes
-    protected static class CountComparator implements Comparator<Word> {
-        @Override
-        public int compare(Word o1, Word o2) {
-            Long c1 = Long.valueOf(o1.count);
-            Long c2 = Long.valueOf(o2.count);
-            return c1.compareTo(c2);
-        }
-        
+
+    /**
+     * Sets a context to the word.
+     * @param context   the array of Word objects, forming the
+     *                  sentence, where the word has been used.
+     */
+    public void setContext(final Word[] context) {
+        this.context = context;
     }
 }

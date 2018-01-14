@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * Utility class. Allows to parse a text of a specified book.
  */
 public final class BookParser4 extends BookParser {
-    protected Map<String, Word> specWords = new HashMap<>();
+    protected Map<String, AbstractWord> specWords = new HashMap<>();
     
     
     public BookParser4() {
@@ -20,26 +20,26 @@ public final class BookParser4 extends BookParser {
     }
     
     @Override
-    protected Map<String, Word> getWords(final String text) {
+    protected Map<String, AbstractWord> getWords(final String text) {
         Pattern splitter = Pattern.compile(PATTERN);
         Matcher m = splitter.matcher(text);
 
-        List<Word2> sentence = new ArrayList<>();
-        List<Word2> needContext = new ArrayList<>();
+        List<Word> sentence = new ArrayList<>();
+        List<Word> needContext = new ArrayList<>();
 
         while (m.find()) {
             String wordStr = m.group().toLowerCase();
             if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
-                Word2 word = new Word2(wordStr);
+                Word word = new Word(wordStr);
 
                 ((WordsTrieT) map).add(word);
                 word = ((WordsTrieT)map).get(wordStr);
                 
                 if (word == null) {
                     //System.out.println("the word wasn't added: " + wordStr);
-                    word = new Word2(wordStr);
+                    word = new Word(wordStr);
                     specWords.put(wordStr, word);
-                    sentence.add((Word2) specWords.get(wordStr));
+                    sentence.add((Word) specWords.get(wordStr));
                     
                 } else {
                     sentence.add(word);
@@ -47,19 +47,19 @@ public final class BookParser4 extends BookParser {
                 }
 
             } else {                
-                Word2 word = (Word2) specWords.get(wordStr);
+                Word word = (Word) specWords.get(wordStr);
                 if (word == null) {
-                    word = new Word2(wordStr);
+                    word = new Word(wordStr);
                     specWords.put(wordStr, word);
                 }
                 sentence.add(word);
             }
         }
         
-        Word2[] context = new Word2[sentence.size()];
+        Word[] context = new Word[sentence.size()];
         context = sentence.toArray(context);
-        for (Word2 w : needContext) {
-            Word2[] curContext = w.getContextArray();
+        for (Word w : needContext) {
+            Word[] curContext = w.getContextArray();
             if (curContext == null 
                     || (context.length > 3 && context.length < curContext.length)) {
                 w.setContext(context);

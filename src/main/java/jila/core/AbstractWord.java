@@ -11,6 +11,10 @@ import javax.json.JsonObjectBuilder;
 
 /**
  * Represents word entity.
+ * It is an abstract class. It does not implement functionality
+ * related to contexts (the sentence, where the word has been used).
+ * How to store and work with context should be decided in the concrete
+ * implementations. It can be array, list, map or anything else.
  */
 public abstract class AbstractWord
         implements Comparable<AbstractWord>, Jsonable {
@@ -77,6 +81,8 @@ public abstract class AbstractWord
 
     /**
      * Returns the sentence, where the word has been used.
+     * How to implement the storage and usage
+     * of the context is dependent on the concrete class.
      * @return  context
      */
     public abstract String getContext();
@@ -115,14 +121,6 @@ public abstract class AbstractWord
     public void setTranslate(final String translate) {
         this.translate = translate;
     }
-
-    /**
-     * Sets the context for the word (i.e. the sentence,
-     * where it was used). How to implement the storage and usage
-     * of the context is dependent on the concrete class.
-     * @param context   the sentence, in which the word has been used
-     */
-    public abstract void setContext(final String context);
 
     /**
      * Sets the new value for the known flag.
