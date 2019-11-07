@@ -1,18 +1,33 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>jila.lingualeo</groupId>
-    <artifactId>lingualeo_helper</artifactId>
+    <artifactId>lingualeo-helper</artifactId>
     <version>0.9</version>
     <name>Lingualeo helper</name>
-  
+
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>13</maven.compiler.source>
+        <maven.compiler.target>13</maven.compiler.target>
     </properties>
-  
+
     <dependencies>
         <dependency>
-            <groupId>org.glassfish</groupId>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>13.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>13.0.1</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>org.glassfish</groupId> <!-- TODO: move to Jackson lib -->
             <artifactId>javax.json</artifactId>
             <version>1.1.4</version>
         </dependency>
@@ -22,48 +37,39 @@
             <version>2.1</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
+            <groupId>org.apache.logging.log4j
+            </groupId> <!-- TODO: move to logback sl4j -->
             <artifactId>log4j-core</artifactId>
             <version>2.1</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-   
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>jila.application.App</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>leo_h</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- <plugin>
+                 <artifactId>maven-assembly-plugin</artifactId>
+                 <configuration>
+                     <archive>
+                         <manifest>
+                             <mainClass>jila.application.App</mainClass>
+                         </manifest>
+                     </archive>
+                     <descriptorRefs>
+                         <descriptorRef>jar-with-dependencies</descriptorRef>
+                     </descriptorRefs>
+                     <finalName>leo_h</finalName>
+                     <appendAssemblyId>false</appendAssemblyId>
+                 </configuration>
+                 <executions>
+                     <execution>
+                         <id>make-assembly</id>
+                         <phase>package</phase>
+                         <goals>
+                             <goal>single</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>-->
         </plugins>
     </build>
 </project>

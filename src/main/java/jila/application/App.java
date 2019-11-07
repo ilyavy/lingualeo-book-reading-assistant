@@ -17,6 +17,7 @@ import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
+import jila.core.AbstractWord;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -51,7 +52,7 @@ public class App extends Application {
 	private LingualeoApi leo;
 	
 	private final int ITEMS_ON_PAGE = 6;
-	private List<Word> words;
+	private List<? extends AbstractWord> words;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -76,14 +77,9 @@ public class App extends Application {
 			}
 		});
 
-		webEngine.load(getClass().getResource("/view/html/index.html").toExternalForm()); 
-		
-		webEngine.setOnAlert(new EventHandler() {
-			@Override
-			public void handle(javafx.event.Event event) {
-				System.out.println("alert: " + event.toString());
-			}
-		});
+		webEngine.load(getClass().getResource("/view/html/index.html").toExternalForm());
+
+		webEngine.setOnAlert(e -> System.out.println("alert: " + e.toString()));
 
 		VBox frame = new VBox(1);
 		frame.getChildren().add(browser);
@@ -194,7 +190,7 @@ public class App extends Application {
         JsonBuilderFactory arrayFactory = Json.createBuilderFactory(null);
         JsonArrayBuilder jsonArrayBuilder = arrayFactory.createArrayBuilder();
         
-        Word word = null;
+        AbstractWord word = null;
         for (int i = (page - 1) * ITEMS_ON_PAGE; 
                 i < Math.min(page * ITEMS_ON_PAGE, words.size()); i++) {
             word = words.get(i);
@@ -308,9 +304,7 @@ public class App extends Application {
 			evt.preventDefault();
 			try {
 				URL url = new URL(evt.getCurrentTarget().toString());
-				Desktop.getDesktop().browse(url.toURI()); // !!!!!!!!!!!! ����
-															// ��� �������� ��
-															// ���������?????
+				Desktop.getDesktop().browse(url.toURI());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
