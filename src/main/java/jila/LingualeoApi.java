@@ -1,4 +1,4 @@
-package jila.core;
+package jila;
 
 import java.io.BufferedReader;
 import java.io.IOException;

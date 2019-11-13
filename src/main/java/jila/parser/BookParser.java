@@ -1,4 +1,4 @@
-package jila.core;
+package jila.parser;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 /**
  * Utility class. Allows to parse a text of a specified book.
  */
-public abstract class BookParser {
+public class BookParser {
     /**
      * Log4j v.2 logger.
      */
@@ -34,22 +34,22 @@ public abstract class BookParser {
     protected final int WORD_LENGTH_THRESHOLD = 3;
 
 
-    protected Map<String, AbstractWord> map;
+    protected Map<String, Word> map;
 
     /**
      * The default constructor.
      */
     public BookParser() {
         logger = LogManager.getLogger();
-        map = new HashMap<String, AbstractWord>();
+        map = new HashMap<String, Word>();
     }
 
     /**
      * Parse a text of a specified book.
      * @param filePath  - absolute path to a file of a book.
-     * @return List<AbstractWord> list of words.
+     * @return List<Word> list of words.
      */
-    public List<AbstractWord> parse(final String filePath) {
+    public List<Word> parse(final String filePath) {
         // TODO: Add support for another book formats.
         String text = getTextFromTxt(filePath);
 
@@ -59,9 +59,8 @@ public abstract class BookParser {
             getWords(sentence);
         }
 
-        List<AbstractWord> words = new ArrayList<>(map.values());
-        //List<AbstractWord> words = new ArrayList<AbstractWord>(getWords(text).values());
-        Collections.sort(words, Collections.reverseOrder(AbstractWord.countOrder()));
+        List<Word> words = new ArrayList<>(map.values());
+        Collections.sort(words, Collections.reverseOrder(Word.countOrder()));
 
         return words;
     }
@@ -110,7 +109,32 @@ public abstract class BookParser {
     }
 
 
-    protected abstract Map<String, AbstractWord> getWords(final String text);
+    protected Map<String, Word> getWords(final String text) {
+        Pattern splitter = Pattern.compile(PATTERN);
+        Matcher m = splitter.matcher(text);
+
+        while (m.find()) {
+            String wordStr = m.group().toLowerCase();
+            if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
+                Word word = (Word) map.get(wordStr);
+                if (word == null) {
+                    word = new Word(wordStr);
+                } else {
+                    word.setCount(word.getCount() + 1);
+                }
+                if (text != null) {
+                    if (word.getContext() == null || word.getContext().length() < 2 ||
+                            word.getContext().length() > text.length()) {
+
+                            word.setContext(text);
+                    }
+                }
+                map.put(wordStr, word);
+            }
+        }
+
+        return map;
+    }
 
     /**
      * Return the Flesch readability score of this document.
@@ -122,7 +146,6 @@ public abstract class BookParser {
         double result = 206.835 - (1.015 * secArg) - (84.6 * thirdArg);
         return result;
     }
-
 
      /**
       * This is a helper function that returns the number of syllables
@@ -178,7 +201,7 @@ public abstract class BookParser {
 
 
     public static void main(String[] args) {
-        BookParser bp = new BookParser4();
+        BookParser bp = new BookParser();
         String text = bp.getTextFromTxt("war-peace.txt");
 
         List<String> sentences = bp.getSentences(text);
@@ -190,9 +213,9 @@ public abstract class BookParser {
         }
         sentences = null;
 
-/*        List<AbstractWord> words = new ArrayList<AbstractWord>(bp.map.values());
+        List<Word> words = new ArrayList<Word>(bp.map.values());
 
-        System.out.println(words.size());*/
+        System.out.println(words.size());
         logger.log(Level.INFO, bp.map.values().size());
         logger.log(Level.INFO, "finished");
     }
