@@ -1,4 +1,4 @@
-package jila.application;
+package jila;
 
 import java.awt.Desktop;
 import java.io.BufferedReader;
@@ -17,7 +17,7 @@ import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
-import jila.core.AbstractWord;
+import jila.parser.Word;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -39,11 +39,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import jila.core.BookParser;
-import jila.core.BookParser4;
-import jila.core.LingualeoApi;
-import jila.core.Word;
-
+import jila.parser.BookParser;
 
 
 public class App extends Application {
@@ -52,7 +48,7 @@ public class App extends Application {
 	private LingualeoApi leo;
 	
 	private final int ITEMS_ON_PAGE = 6;
-	private List<? extends AbstractWord> words;
+	private List<? extends Word> words;
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -166,7 +162,7 @@ public class App extends Application {
 			if (selectedFile == null)
 				return;
 
-			BookParser bp = new BookParser4();
+			BookParser bp = new BookParser();
 			words = bp.parse(selectedFile.getAbsolutePath());
 
 			// Show results
@@ -190,7 +186,7 @@ public class App extends Application {
         JsonBuilderFactory arrayFactory = Json.createBuilderFactory(null);
         JsonArrayBuilder jsonArrayBuilder = arrayFactory.createArrayBuilder();
         
-        AbstractWord word = null;
+        Word word = null;
         for (int i = (page - 1) * ITEMS_ON_PAGE; 
                 i < Math.min(page * ITEMS_ON_PAGE, words.size()); i++) {
             word = words.get(i);

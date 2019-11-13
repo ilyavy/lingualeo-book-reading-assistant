@@ -1,4 +1,4 @@
-package jila.core;
+package jila.parser;
 
 import java.util.Map;
 

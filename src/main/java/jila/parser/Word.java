@@ -1,4 +1,4 @@
-package jila.core;
+package jila.parser;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -16,8 +16,7 @@ import javax.json.JsonObjectBuilder;
  * How to store and work with context should be decided in the concrete
  * implementations. It can be array, list, map or anything else.
  */
-public abstract class AbstractWord
-        implements Comparable<AbstractWord>, Jsonable {
+public class Word implements Comparable<Word>, Jsonable {
     /**
      * String value of word entity.
      */
@@ -27,6 +26,13 @@ public abstract class AbstractWord
      * The translation of the word.
      */
     private String translate = "";
+
+    /**
+     * The context is stored as an array of Word objects.
+     * The order of the words in the array is the same as
+     * the order in the original sentence.
+     */
+    private String context = null;
 
     /**
      * The flag, which shows either the word is known by the user or not.
@@ -41,14 +47,14 @@ public abstract class AbstractWord
     /**
      * The default constructor.
      */
-    public AbstractWord() {
+    public Word() {
     }
 
     /**
      * Creates the word entity by its string value.
      * @param word  string representation of the word
      */
-    public AbstractWord(final String word) {
+    public Word(final String word) {
         setWord(word);
     }
 
@@ -57,7 +63,7 @@ public abstract class AbstractWord
      * @param word  string representation of the word
      * @param translate the translation of the word
      */
-    public AbstractWord(final String word, final String translate) {
+    public Word(final String word, final String translate) {
         this(word);
         setTranslate(translate);
     }
@@ -80,12 +86,22 @@ public abstract class AbstractWord
     }
 
     /**
-     * Returns the sentence, where the word has been used.
-     * How to implement the storage and usage
-     * of the context is dependent on the concrete class.
-     * @return  context
+     * Returns the context (the sentence, where the word
+     * has been used) as a string object.
+     * @return
      */
-    public abstract String getContext();
+    public String getContext() {
+        return context;
+    }
+
+    /**
+     * Sets a context to the word.
+     * @param context   the array of Word objects, forming the
+     *                  sentence, where the word has been used.
+     */
+    public void setContext(final String context) {
+        this.context = context;
+    }
 
     /**
      * Returns the value of the known flag.
@@ -153,7 +169,7 @@ public abstract class AbstractWord
      * @return  -1 - this < that, 0 - equal, +1 - this > that
      */
     @Override
-    public int compareTo(final AbstractWord that) {
+    public int compareTo(final Word that) {
         return word.compareTo(that.word);
     }
 
@@ -165,10 +181,10 @@ public abstract class AbstractWord
      */
     @Override
     public boolean equals(final Object o) {
-        if (!(o instanceof AbstractWord)) {
+        if (!(o instanceof Word)) {
             return false;
         }
-        AbstractWord that = (AbstractWord) o;
+        Word that = (Word) o;
         if (word.equals(that.word) && count == that.count) {
             return true;
         }
@@ -215,7 +231,7 @@ public abstract class AbstractWord
      * Creates new CountComparator.
      * @return new CountComparator
      */
-    public static Comparator<AbstractWord> countOrder() {
+    public static Comparator<Word> countOrder() {
         return new CountComparator();
     }
 
@@ -225,7 +241,7 @@ public abstract class AbstractWord
      * in order to compare them.
      */
     protected static class CountComparator
-            implements Comparator<AbstractWord> {
+            implements Comparator<Word> {
         /**
          * Compares the word entities by their field count, i.e. the word
          * is bigger if it has been found more often in the source text.
@@ -234,7 +250,7 @@ public abstract class AbstractWord
          * @return -1 - o1 < o2, 0 - equal, +1 - o2 > o1
          */
         @Override
-        public int compare(final AbstractWord o1, final AbstractWord o2) {
+        public int compare(final Word o1, final Word o2) {
             Long c1 = Long.valueOf(o1.count);
             Long c2 = Long.valueOf(o2.count);
             return c1.compareTo(c2);
