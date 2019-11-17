@@ -1,10 +1,5 @@
 package jila.parser;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,14 +9,15 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jila.reader.BookReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility class. Allows to parse a text of a specified book.
  */
-public class BookParser {
-    /**
-     * Log4j v.2 logger.
-     */
-    protected static Logger logger;
+public class BookTextParser {
+    protected static Logger logger = LoggerFactory.getLogger(BookTextParser.class);
 
     /**
      * Regex pattern for finding words in the text.
@@ -34,26 +30,23 @@ public class BookParser {
     protected final int WORD_LENGTH_THRESHOLD = 3;
 
 
-    protected Map<String, Word> map;
+    protected Map<String, Word> map = new HashMap<>();
 
     /**
      * The default constructor.
      */
-    public BookParser() {
-        logger = LogManager.getLogger();
-        map = new HashMap<String, Word>();
+    public BookTextParser() {
+
     }
 
     /**
      * Parse a text of a specified book.
-     * @param filePath  - absolute path to a file of a book.
+     *
+     * @param bookText - the text of the book
      * @return List<Word> list of words.
      */
-    public List<Word> parse(final String filePath) {
-        // TODO: Add support for another book formats.
-        String text = getTextFromTxt(filePath);
-
-        List<String> sentences = getSentences(text);
+    public List<Word> parse(final String bookText) {
+        List<String> sentences = getSentences(bookText);
 
         for (String sentence : sentences) {
             getWords(sentence);
@@ -67,33 +60,11 @@ public class BookParser {
 
 
     /**
-     * Extracts a text from a TXT file.
-     * @param filePath  - absolute path to a file.
-     * @return  String - text of a book.
-     */
-    protected String getTextFromTxt(final String filePath) {
-        StringBuilder sb = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(filePath));
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line + " ");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return sb.toString();
-    }
-
-
-    /**
      * Returns the list of strings, each of which is a sentence
      * from the provided text.
-     * @param text  text to analyze.
-     * @return  list of sentences.
+     *
+     * @param text text to analyze.
+     * @return list of sentences.
      */
     protected List<String> getSentences(final String text) {
         List<String> sentences = new ArrayList<>();
@@ -126,7 +97,7 @@ public class BookParser {
                     if (word.getContext() == null || word.getContext().length() < 2 ||
                             word.getContext().length() > text.length()) {
 
-                            word.setContext(text);
+                        word.setContext(text);
                     }
                 }
                 map.put(wordStr, word);
@@ -140,47 +111,48 @@ public class BookParser {
      * Return the Flesch readability score of this document.
      */
     public double getFleschScore(final long numSentences,
-            final long numWords, final long numSyllables) {
+                                 final long numWords, final long numSyllables) {
         double secArg = (double) numWords / numSentences;
         double thirdArg = (double) numSyllables / numWords;
         double result = 206.835 - (1.015 * secArg) - (84.6 * thirdArg);
         return result;
     }
 
-     /**
-      * This is a helper function that returns the number of syllables
-      * in a word.  You should write this and use it in your
-      * BasicDocument class.
-      * You will probably NOT need to add a countWords or a countSentences method
-      * here.  The reason we put countSyllables here because we'll use it again
-      * next week when we implement the EfficientDocument class.
-      */
-     protected int countSyllables(String word) {
-            int counter = 0;
-            char[] tokens = word.toCharArray();
-            if (isVowel(tokens[0])) {
-                counter = 1;
-            }
-            for (int i = 1; i < tokens.length; i++) {
-                if (i == tokens.length - 1 && Character.toLowerCase(tokens[i]) == 'e') {
-                    if (!isVowel(tokens[i - 1])) {
-                        if (counter == 0) {
-                            counter = 1;
-                        }
-                    }
-                } else if (!isVowel(tokens[i - 1]) && isVowel(tokens[i])) {
-                    counter++;
-                }
-            }
-
-            return counter;
+    /**
+     * This is a helper function that returns the number of syllables
+     * in a word.  You should write this and use it in your
+     * BasicDocument class.
+     * You will probably NOT need to add a countWords or a countSentences method
+     * here.  The reason we put countSyllables here because we'll use it again
+     * next week when we implement the EfficientDocument class.
+     */
+    protected int countSyllables(String word) {
+        int counter = 0;
+        char[] tokens = word.toCharArray();
+        if (isVowel(tokens[0])) {
+            counter = 1;
         }
-    
+        for (int i = 1; i < tokens.length; i++) {
+            if (i == tokens.length - 1 && Character.toLowerCase(tokens[i]) == 'e') {
+                if (!isVowel(tokens[i - 1])) {
+                    if (counter == 0) {
+                        counter = 1;
+                    }
+                }
+            } else if (!isVowel(tokens[i - 1]) && isVowel(tokens[i])) {
+                counter++;
+            }
+        }
+
+        return counter;
+    }
+
 
     /**
      * Returns is a given char symbol a vowel or not.
-     * @param  letter   provided char symbol
-     * @return  boolean: false or true.
+     *
+     * @param letter provided char symbol
+     * @return boolean: false or true.
      */
     protected boolean isVowel(final char letter) {
         char[] vowels = new char[6];
@@ -190,7 +162,7 @@ public class BookParser {
         vowels[3] = 'o';
         vowels[4] = 'u';
         vowels[5] = 'y';
-        
+
         for (int i = 0; i < 6; i++) {
             if (Character.toLowerCase(letter) == vowels[i]) {
                 return true;
@@ -200,9 +172,9 @@ public class BookParser {
     }
 
 
-    public static void main(String[] args) {
-        BookParser bp = new BookParser();
-        String text = bp.getTextFromTxt("war-peace.txt");
+    public static void main(String[] args) throws IOException {
+        BookTextParser bp = new BookTextParser();
+        String text = BookReader.createInstance("war-peace.txt").readIntoString();
 
         List<String> sentences = bp.getSentences(text);
         text = null;
@@ -213,10 +185,8 @@ public class BookParser {
         }
         sentences = null;
 
-        List<Word> words = new ArrayList<Word>(bp.map.values());
+        List<Word> words = new ArrayList<>(bp.map.values());
 
         System.out.println(words.size());
-        logger.log(Level.INFO, bp.map.values().size());
-        logger.log(Level.INFO, "finished");
     }
 }
