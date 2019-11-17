@@ -44,30 +44,30 @@
 
     <build>
         <plugins>
-            <!-- <plugin>
-                 <artifactId>maven-assembly-plugin</artifactId>
-                 <configuration>
-                     <archive>
-                         <manifest>
-                             <mainClass>jila.App</mainClass>
-                         </manifest>
-                     </archive>
-                     <descriptorRefs>
-                         <descriptorRef>jar-with-dependencies</descriptorRef>
-                     </descriptorRefs>
-                     <finalName>leo_h</finalName>
-                     <appendAssemblyId>false</appendAssemblyId>
-                 </configuration>
-                 <executions>
-                     <execution>
-                         <id>make-assembly</id>
-                         <phase>package</phase>
-                         <goals>
-                             <goal>single</goal>
-                         </goals>
-                     </execution>
-                 </executions>
-             </plugin>-->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>jila.App</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <finalName>leo_h</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
