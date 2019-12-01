@@ -6,10 +6,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jila.reader.BookReader;
+import jila.reader.BookFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,8 +175,8 @@ public class BookTextParser {
 
 
     public static void main(String[] args) throws IOException {
-        BookTextParser bp = new BookTextParser();
-        String text = BookReader.createInstance("war-peace.txt").readIntoString();
+/*        BookTextParser bp = new BookTextParser();
+        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
 
         List<String> sentences = bp.getSentences(text);
         text = null;
@@ -187,6 +189,122 @@ public class BookTextParser {
 
         List<Word> words = new ArrayList<>(bp.map.values());
 
+        System.out.println(words.size());*/
+
+
+        BookTextParser bp = new BookTextParser();
+        // String text = BookFileReader.createInstance("little_red_riding_hood.txt").readIntoString();
+        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
+
+        List<String> sentences = bp.getSentences(text);
+        text = null;
+
+        int numberOfCores = Runtime.getRuntime().availableProcessors();
+        System.out.println("available cores: " + numberOfCores);
+
+        ParseTextTask task = bp.new ParseTextTask(0, sentences.size(), sentences,
+                sentences.size() / numberOfCores);
+        List<Word> words = new ArrayList<>(task.compute().values());
+
         System.out.println(words.size());
+        print(words);
+    }
+
+    public static void print(List<Word> words) {
+        for (int i = 0; i < (10 < words.size() ? 10 : words.size()); i++) {
+            System.out.println(words.get(i));
+        }
+    }
+
+
+    public class ParseTextTask extends RecursiveTask<Map<String, Word>> {
+
+        private int lo;
+        private int hi;
+        private List<String> sentences;
+        private int sequentialThreshold;
+
+        public ParseTextTask(int lo, int hi, List<String> sentences, int sequentialThreshold) {
+            this.lo = lo;
+            this.hi = hi;
+            this.sentences = sentences;
+            this.sequentialThreshold = sequentialThreshold;
+
+            System.out.println(this);
+        }
+
+        @Override
+        protected Map<String, Word> compute() {
+
+            if (hi - lo <= sequentialThreshold) {
+                Map<String, Word> map = new HashMap<>();
+                for (int i = lo; i < hi; i++) {
+                    String sentence = sentences.get(i);
+                    getWordss(map, sentence);
+                }
+                return map;
+
+            } else {
+                // TODO: set the ForkJoinPool's size
+
+                int mid = (hi - lo) / 2;
+                ParseTextTask left = new ParseTextTask(lo, mid, sentences, sequentialThreshold);
+                left.fork();
+                ParseTextTask right = new ParseTextTask(mid + 1, hi, sentences, sequentialThreshold);
+
+                return mergeMaps(right.compute(), left.join());
+            }
+        }
+
+        protected Map<String, Word> mergeMaps(Map<String, Word> left, Map<String, Word> right) {
+            left.forEach((k, v) ->
+                    right.merge(k, v, (w1, w2) -> {
+                        w1.setCount(w1.getCount() + w2.getCount());
+
+                        if (w2.getContext().length() < w1.getContext().length()) {
+                            w1.setContext(w2.getContext());
+                        }
+
+                        return w1;
+                    }));
+
+            return right;
+        }
+
+        protected Map<String, Word> getWordss(final Map<String, Word> map, final String text) {
+            Pattern splitter = Pattern.compile(PATTERN);
+            Matcher m = splitter.matcher(text);
+
+            while (m.find()) {
+                String wordStr = m.group().toLowerCase();
+                if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
+                    Word word = (Word) map.get(wordStr);
+                    if (word == null) {
+                        word = new Word(wordStr);
+                    } else {
+                        word.setCount(word.getCount() + 1);
+                    }
+                    if (text != null) {
+                        if (word.getContext() == null || word.getContext().length() < 2 ||
+                                word.getContext().length() > text.length()) {
+
+                            word.setContext(text);
+                        }
+                    }
+                    map.put(wordStr, word);
+                }
+            }
+
+            return map;
+        }
+
+        @Override
+        public String toString() {
+            return "ParseTextTask{" +
+                    "lo=" + lo +
+                    ", hi=" + hi +
+                    ", sequentialThreshold=" + sequentialThreshold +
+                    '}';
+        }
     }
 }

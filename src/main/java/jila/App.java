@@ -29,7 +29,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import jila.parser.BookTextParser;
 import jila.parser.Word;
-import jila.reader.BookReader;
+import jila.reader.BookFileReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -153,7 +153,7 @@ public class App extends Application {
                 return;
 
             BookTextParser bp = new BookTextParser();
-            BookReader reader = BookReader.createInstance(selectedFile.getAbsolutePath());
+            BookFileReader reader = BookFileReader.createInstance(selectedFile.getAbsolutePath());
             try {
                 words = bp.parse(reader.readIntoString());
             } catch (IOException e) {

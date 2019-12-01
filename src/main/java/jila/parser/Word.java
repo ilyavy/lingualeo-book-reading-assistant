@@ -160,7 +160,7 @@ public class Word implements Comparable<Word>, Jsonable {
      */
     @Override
     public String toString() {
-        return word;
+        return word + " :: " + getCount();
     }
 
     /**
