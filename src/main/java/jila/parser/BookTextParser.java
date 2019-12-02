@@ -12,6 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jila.reader.BookFileReader;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.runner.RunnerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,41 +175,49 @@ public class BookTextParser {
         return false;
     }
 
-
-    public static void main(String[] args) throws IOException {
-/*        BookTextParser bp = new BookTextParser();
-        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
-
-        List<String> sentences = bp.getSentences(text);
-        text = null;
-
+    public void sequential(final List<String> sentences) throws IOException {
         for (int i = 0; i < (int) sentences.size(); i++) {
             String sentence = sentences.get(i);
-            bp.getWords(sentence);
+            getWords(sentence);
         }
-        sentences = null;
 
-        List<Word> words = new ArrayList<>(bp.map.values());
+        List<Word> words = new ArrayList<>(map.values());
 
-        System.out.println(words.size());*/
+        System.out.println(words.size());
+    }
 
-
-        BookTextParser bp = new BookTextParser();
-        // String text = BookFileReader.createInstance("little_red_riding_hood.txt").readIntoString();
-        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
-
-        List<String> sentences = bp.getSentences(text);
-        text = null;
-
+    public void forkJoinWithThreshold(final List<String> sentences) throws IOException {
         int numberOfCores = Runtime.getRuntime().availableProcessors();
         System.out.println("available cores: " + numberOfCores);
 
-        ParseTextTask task = bp.new ParseTextTask(0, sentences.size(), sentences,
+        ParseTextTask task = new ParseTextTask(0, sentences.size(), sentences,
                 sentences.size() / numberOfCores);
         List<Word> words = new ArrayList<>(task.compute().values());
 
         System.out.println(words.size());
         print(words);
+    }
+
+    public void futures() {
+
+    }
+
+
+
+    public static void main(String[] args) throws IOException, RunnerException {
+
+        bp = new BookTextParser();
+
+        // String text = BookFileReader.createInstance("little_red_riding_hood.txt").readIntoString();
+        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
+
+        List<String> sentences = bp.getSentences(text);
+        System.out.println("The number of sentences: " + sentences.size());
+        text = null;
+
+        bp.sequential(sentences);
+
+        bp.forkJoinWithThreshold(sentences);
     }
 
     public static void print(List<Word> words) {
@@ -248,9 +258,9 @@ public class BookTextParser {
                 // TODO: set the ForkJoinPool's size
 
                 int mid = (hi - lo) / 2;
-                ParseTextTask left = new ParseTextTask(lo, mid, sentences, sequentialThreshold);
+                ParseTextTask left = new ParseTextTask(lo, lo + mid, sentences, sequentialThreshold);
                 left.fork();
-                ParseTextTask right = new ParseTextTask(mid + 1, hi, sentences, sequentialThreshold);
+                ParseTextTask right = new ParseTextTask(lo + mid, hi, sentences, sequentialThreshold);
 
                 return mergeMaps(right.compute(), left.join());
             }
