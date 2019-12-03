@@ -28,10 +28,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class. Allows to parse a text of a specified book.
  */
-@BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
-@State(Scope.Benchmark)
-@Fork(value = 2, jvmArgs = {"-Xms2G", "-Xmx2G"})
 public class BookTextParser {
     protected static Logger logger = LoggerFactory.getLogger(BookTextParser.class);
 
@@ -82,7 +78,7 @@ public class BookTextParser {
      * @param text text to analyze.
      * @return list of sentences.
      */
-    protected List<String> getSentences(final String text) {
+    public List<String> getSentences(final String text) {
         List<String> sentences = new ArrayList<>();
         Pattern splitter = Pattern.compile("[^!?.]+");
         Matcher m = splitter.matcher(text);
@@ -187,24 +183,21 @@ public class BookTextParser {
         return false;
     }
 
-    @Benchmark
-    public void sequential() throws IOException {
+    public void sequential(List<String> sentences) throws IOException {
         for (int i = 0; i < (int) sentences.size(); i++) {
             String sentence = sentences.get(i);
-            bp.getWords(sentence);
+            getWords(sentence);
         }
 
         List<Word> words = new ArrayList<>(map.values());
-
         System.out.println(words.size());
     }
 
-    @Benchmark
-    public void forkJoinWithThreshold() throws IOException {
+    public void forkJoinWithThreshold(List<String> sentences) throws IOException {
         int numberOfCores = Runtime.getRuntime().availableProcessors();
         System.out.println("available cores: " + numberOfCores);
 
-        ParseTextTask task = bp.new ParseTextTask(0, sentences.size(), sentences,
+        ParseTextTask task = new ParseTextTask(0, sentences.size(), sentences,
                 sentences.size() / numberOfCores);
         List<Word> words = new ArrayList<>(task.compute().values());
 
@@ -216,30 +209,8 @@ public class BookTextParser {
 
     }
 
+    public void concurrentMapWithAtomics() {
 
-    private BookTextParser bp;
-    private List<String> sentences;
-
-    @Setup
-    public void setup() throws IOException {
-        bp = new BookTextParser();
-
-        // String text = BookFileReader.createInstance("little_red_riding_hood.txt").readIntoString();
-        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
-
-        sentences = bp.getSentences(text);
-        System.out.println("The number of sentences: " + sentences.size());
-        text = null;
-    }
-
-
-    public static void main(String[] args) throws IOException, RunnerException {
-
-        org.openjdk.jmh.Main.main(args);
-
-/*        bp.sequential(sentences);
-
-        bp.forkJoinWithThreshold(sentences);*/
     }
 
     public static void print(List<Word> words) {
@@ -249,6 +220,9 @@ public class BookTextParser {
     }
 
 
+    /**
+     *
+     */
     public class ParseTextTask extends RecursiveTask<Map<String, Word>> {
 
         private int lo;
