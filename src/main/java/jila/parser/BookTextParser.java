@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.TimeUnit;
@@ -205,12 +206,85 @@ public class BookTextParser {
         print(words);
     }
 
-    public void futures() {
+    protected Map<String, Word> getWordss(final Map<String, Word> map, final String text) {
+        Pattern splitter = Pattern.compile(PATTERN);
+        Matcher m = splitter.matcher(text);
 
+        while (m.find()) {
+            String wordStr = m.group().toLowerCase();
+            if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
+                Word word = (Word) map.get(wordStr);
+                if (word == null) {
+                    word = new Word(wordStr);
+                } else {
+                    word.setCount(word.getCount() + 1);
+                }
+                if (text != null) {
+                    if (word.getContext() == null || word.getContext().length() < 2 ||
+                            word.getContext().length() > text.length()) {
+
+                        word.setContext(text);
+                    }
+                }
+                map.put(wordStr, word);
+            }
+        }
+
+        return map;
     }
+
+    protected Map<String, Word> mergeMaps(Map<String, Word> left, Map<String, Word> right) {
+        left.forEach((k, v) ->
+                right.merge(k, v, (w1, w2) -> {
+                    w1.setCount(w1.getCount() + w2.getCount());
+
+                    if (w2.getContext().length() < w1.getContext().length()) {
+                        w1.setContext(w2.getContext());
+                    }
+
+                    return w1;
+                }));
+
+        return right;
+    }
+
+    public void futures(List<String> sentences) {
+        int step = sentences.size() / Runtime.getRuntime().availableProcessors();
+        System.out.println("STEP is: " + step);
+
+        for (int i = 0; i < sentences.size(); i = i + step) {
+            CompletableFuture
+                    .supplyAsync(() -> getWordsInFuture(sentences, i, i + step));
+        }
+    }
+
+    protected Map<String, Word> getWordsInFuture(List<String> sentences, int lo, int hi) {
+        Map<String, Word> map = new HashMap<>();
+        for (int i = lo; i < hi; i++) {
+            String sentence = sentences.get(i);
+            getWordss(map, sentence);
+        }
+
+        return map;
+    }
+
+    protected
 
     public void concurrentMapWithAtomics() {
 
+    }
+
+    public static void main(String[] args) {
+        BookTextParser bookParser = new BookTextParser();
+
+        // String text = BookFileReader.createInstance("little_red_riding_hood.txt").readIntoString();
+        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
+
+        List<String> sentences = bookParser.getSentences(text);
+        System.out.println("The number of sentences: " + sentences.size());
+        text = null;
+
+        bookParser.futures(sentences);
     }
 
     public static void print(List<Word> words) {
@@ -260,48 +334,6 @@ public class BookTextParser {
 
                 return mergeMaps(right.compute(), left.join());
             }
-        }
-
-        protected Map<String, Word> mergeMaps(Map<String, Word> left, Map<String, Word> right) {
-            left.forEach((k, v) ->
-                    right.merge(k, v, (w1, w2) -> {
-                        w1.setCount(w1.getCount() + w2.getCount());
-
-                        if (w2.getContext().length() < w1.getContext().length()) {
-                            w1.setContext(w2.getContext());
-                        }
-
-                        return w1;
-                    }));
-
-            return right;
-        }
-
-        protected Map<String, Word> getWordss(final Map<String, Word> map, final String text) {
-            Pattern splitter = Pattern.compile(PATTERN);
-            Matcher m = splitter.matcher(text);
-
-            while (m.find()) {
-                String wordStr = m.group().toLowerCase();
-                if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
-                    Word word = (Word) map.get(wordStr);
-                    if (word == null) {
-                        word = new Word(wordStr);
-                    } else {
-                        word.setCount(word.getCount() + 1);
-                    }
-                    if (text != null) {
-                        if (word.getContext() == null || word.getContext().length() < 2 ||
-                                word.getContext().length() > text.length()) {
-
-                            word.setContext(text);
-                        }
-                    }
-                    map.put(wordStr, word);
-                }
-            }
-
-            return map;
         }
 
         @Override
