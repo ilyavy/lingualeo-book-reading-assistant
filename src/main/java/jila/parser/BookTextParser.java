@@ -6,14 +6,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jila.reader.BookFileReader;
+import org.assertj.core.api.Assertions;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -25,6 +31,8 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Utility class. Allows to parse a text of a specified book.
@@ -202,7 +210,6 @@ public class BookTextParser {
                 sentences.size() / numberOfCores);
         List<Word> words = new ArrayList<>(task.compute().values());
 
-        System.out.println(words.size());
         print(words);
     }
 
@@ -248,14 +255,37 @@ public class BookTextParser {
         return right;
     }
 
-    public void futures(List<String> sentences) {
-        int step = sentences.size() / Runtime.getRuntime().availableProcessors();
-        System.out.println("STEP is: " + step);
+    private final ArrayBlockingQueue<Map<String, Word>> futuresQueue =
+            new ArrayBlockingQueue<>(20);
+    private final AtomicInteger counter = new AtomicInteger(0);
+
+    public List<Word> futures(List<String> sentences) throws ExecutionException, InterruptedException {
+        counter.set(Runtime.getRuntime().availableProcessors());
+
+        final int step = (int) Math.ceil(sentences.size() / Double.valueOf(Runtime.getRuntime().availableProcessors()));
 
         for (int i = 0; i < sentences.size(); i = i + step) {
+            int lo = i;
+            int hi = Math.min(i + step, sentences.size());
             CompletableFuture
-                    .supplyAsync(() -> getWordsInFuture(sentences, i, i + step));
+                    .supplyAsync(() -> getWordsInFuture(sentences, lo, hi))
+                    .thenAccept(map -> {
+                        futuresQueue.add(map);
+                        counter.decrementAndGet();
+                    });
         }
+
+        Map<String, Word> result = CompletableFuture.supplyAsync(() -> {
+            Map<String, Word> r = null;
+            try {
+                r = mergeFromQueue();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return r;
+        }).get();
+
+        return new ArrayList<>(result.values());
     }
 
     protected Map<String, Word> getWordsInFuture(List<String> sentences, int lo, int hi) {
@@ -265,16 +295,30 @@ public class BookTextParser {
             getWordss(map, sentence);
         }
 
+        // System.out.println("!--- finished: " + lo + ", " + hi);
+
         return map;
     }
 
-    protected
+    public Map<String, Word> mergeFromQueue() throws InterruptedException {
+        var left = futuresQueue.take();
+        var right = futuresQueue.take();
+
+        var result = mergeMaps(left, right);
+
+        if (counter.get() == 0 && futuresQueue.size() == 0) {
+            return result;
+        }
+
+        futuresQueue.put(result);
+        return mergeFromQueue();
+    }
 
     public void concurrentMapWithAtomics() {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         BookTextParser bookParser = new BookTextParser();
 
         // String text = BookFileReader.createInstance("little_red_riding_hood.txt").readIntoString();
@@ -284,13 +328,74 @@ public class BookTextParser {
         System.out.println("The number of sentences: " + sentences.size());
         text = null;
 
-        bookParser.futures(sentences);
+        CompletableFuture<List<Word>> f1 = CompletableFuture.supplyAsync(() -> {
+            List<Word> result = null;
+            try {
+                result = new BookTextParser().futures(sentences);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        });
+
+        CompletableFuture<List<Word>> f2 = CompletableFuture.supplyAsync(() -> {
+            List<Word> result = null;
+            try {
+                result = new BookTextParser().futures(sentences);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        });
+
+        CompletableFuture<List<Word>> f3 = CompletableFuture.supplyAsync(() -> {
+            List<Word> result = null;
+            try {
+                result = new BookTextParser().futures(sentences);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        });
+
+        CompletableFuture<List<Word>> f4 = CompletableFuture.supplyAsync(() -> {
+            List<Word> result = null;
+            try {
+                result = new BookTextParser().futures(sentences);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        });
+
+        CompletableFuture<List<Word>> f5 = CompletableFuture.supplyAsync(() -> {
+            List<Word> result = null;
+            try {
+                result = new BookTextParser().futures(sentences);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return result;
+        });
+
+        /*assertThat(f1.get())
+                .isEqualTo(f2.get())
+                .isEqualTo(f3.get())
+                .isEqualTo(f4.get())
+                .isEqualTo(f5.get());*/
+
+        print(f1.get());
+        print(f2.get());
+        print(f3.get());
+        print(f4.get());
+        print(f5.get());
     }
 
     public static void print(List<Word> words) {
-        for (int i = 0; i < (10 < words.size() ? 10 : words.size()); i++) {
+        System.out.println("--SIZE: " + words.size());
+        /*for (int i = 0; i < (5 < words.size() ? 5 : words.size()); i++) {
             System.out.println(words.get(i));
-        }
+        }*/
     }
 
 
@@ -310,7 +415,7 @@ public class BookTextParser {
             this.sentences = sentences;
             this.sequentialThreshold = sequentialThreshold;
 
-            System.out.println(this);
+            // System.out.println(this);
         }
 
         @Override

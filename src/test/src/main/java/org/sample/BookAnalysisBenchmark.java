@@ -2,6 +2,7 @@ package org.sample;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import jila.parser.BookTextParser;
@@ -21,34 +22,32 @@ import org.openjdk.jmh.annotations.State;
 @Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx2G"})
 public class BookAnalysisBenchmark {
 
-    private BookTextParser bookParser;
-
     private List<String> sentences;
 
     @Setup
     public void setup() throws IOException {
-        bookParser = new BookTextParser();
-
-        // String text = BookFileReader.createInstance("little_red_riding_hood.txt").readIntoString();
         String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
 
-        sentences = bookParser.getSentences(text);
-        System.out.println("The number of sentences: " + sentences.size());
-        text = null;
+        BookTextParser bp = new BookTextParser();
+        sentences = bp.getSentences(text);
     }
 
     @Benchmark
     public void sequential() throws IOException {
+        BookTextParser bookParser = new BookTextParser();
         bookParser.sequential(sentences);
     }
 
     @Benchmark
     public void forkJoinWithThreshold() throws IOException {
+        BookTextParser bookParser = new BookTextParser();
         bookParser.forkJoinWithThreshold(sentences);
     }
 
-    public void futures() {
-
+    @Benchmark
+    public void futures() throws ExecutionException, InterruptedException, IOException {
+        BookTextParser bookParser = new BookTextParser();
+        bookParser.futures(sentences);
     }
 
     public void concurrentMapWithAtomics() {
