@@ -8,27 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jila.reader.BookFileReader;
-import org.assertj.core.api.Assertions;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.runner.RunnerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,16 +98,17 @@ public class BookTextParser {
                 Word word = (Word) map.get(wordStr);
                 if (word == null) {
                     word = new Word(wordStr);
+                    word.setContext(text);
                 } else {
                     word.setCount(word.getCount() + 1);
                 }
-                if (text != null) {
+                /*if (text != null) {
                     if (word.getContext() == null || word.getContext().length() < 2 ||
                             word.getContext().length() > text.length()) {
 
                         word.setContext(text);
                     }
-                }
+                }*/
                 map.put(wordStr, word);
             }
         }
@@ -207,7 +195,7 @@ public class BookTextParser {
         System.out.println("available cores: " + numberOfCores);
 
         ParseTextTask task = new ParseTextTask(0, sentences.size(), sentences,
-                sentences.size() / numberOfCores);
+                (int) Math.ceil(sentences.size() / Double.valueOf(numberOfCores)));
         List<Word> words = new ArrayList<>(task.compute().values());
 
         print(words);
@@ -223,16 +211,17 @@ public class BookTextParser {
                 Word word = (Word) map.get(wordStr);
                 if (word == null) {
                     word = new Word(wordStr);
+                    word.setContext(text);
                 } else {
                     word.setCount(word.getCount() + 1);
                 }
-                if (text != null) {
+/*                if (text != null) {
                     if (word.getContext() == null || word.getContext().length() < 2 ||
                             word.getContext().length() > text.length()) {
 
                         word.setContext(text);
                     }
-                }
+                }*/
                 map.put(wordStr, word);
             }
         }
@@ -314,8 +303,18 @@ public class BookTextParser {
         return mergeFromQueue();
     }
 
-    public void concurrentMapWithAtomics() {
 
+    Map<String, WordWithAtomicCounter> wordsMap = new ConcurrentHashMap<>();
+
+    public void concurrentMapWithAtomicsUsingForkJoin(List<String> sentences) {
+        int numberOfCores = Runtime.getRuntime().availableProcessors();
+        // System.out.println("available cores: " + numberOfCores);
+
+        ParseTextTaskWithConcurrentMap task = new ParseTextTaskWithConcurrentMap(0, sentences.size(), sentences,
+                (int) Math.ceil(sentences.size() / Double.valueOf(numberOfCores)));
+        List<WordWithAtomicCounter> words = new ArrayList<>(task.compute().values());
+
+        printt(words);
     }
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
@@ -328,7 +327,9 @@ public class BookTextParser {
         System.out.println("The number of sentences: " + sentences.size());
         text = null;
 
-        CompletableFuture<List<Word>> f1 = CompletableFuture.supplyAsync(() -> {
+        new BookTextParser().concurrentMapWithAtomicsUsingForkJoin(sentences);
+
+        /*CompletableFuture<List<Word>> f1 = CompletableFuture.supplyAsync(() -> {
             List<Word> result = null;
             try {
                 result = new BookTextParser().futures(sentences);
@@ -376,7 +377,7 @@ public class BookTextParser {
                 e.printStackTrace();
             }
             return result;
-        });
+        });*/
 
         /*assertThat(f1.get())
                 .isEqualTo(f2.get())
@@ -384,24 +385,111 @@ public class BookTextParser {
                 .isEqualTo(f4.get())
                 .isEqualTo(f5.get());*/
 
-        print(f1.get());
+/*        print(f1.get());
         print(f2.get());
         print(f3.get());
         print(f4.get());
-        print(f5.get());
+        print(f5.get());*/
     }
 
     public static void print(List<Word> words) {
         System.out.println("--SIZE: " + words.size());
-        /*for (int i = 0; i < (5 < words.size() ? 5 : words.size()); i++) {
+        /*int numberOfPrintedWords = 20;
+        for (int i = 0; i < (numberOfPrintedWords < words.size() ? numberOfPrintedWords : words.size()); i++) {
+            System.out.println(words.get(i));
+        }*/
+    }
+
+    public static void printt(List<WordWithAtomicCounter> words) {
+        System.out.println("--SIZE: " + words.size());
+        /*int numberOfPrintedWords = 20;
+        for (int i = 0; i < (numberOfPrintedWords < words.size() ? numberOfPrintedWords : words.size()); i++) {
             System.out.println(words.get(i));
         }*/
     }
 
 
-    /**
-     *
-     */
+    protected Map<String, WordWithAtomicCounter> getWordsWithConcurrentMap(final String text) {
+        Pattern splitter = Pattern.compile(PATTERN);
+        Matcher m = splitter.matcher(text);
+
+        while (m.find()) {
+            String wordStr = m.group().toLowerCase();
+            if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
+
+                WordWithAtomicCounter wordRes = wordsMap.get(wordStr);
+                if (wordRes == null) {
+                    WordWithAtomicCounter word = new WordWithAtomicCounter(wordStr);
+                    word.setContext(text);
+                    wordRes = wordsMap.merge(wordStr, word, (w1, w2) -> w1);
+                }
+                wordRes.incrementCount();
+
+/*                if (text != null) {
+                    if (word.getContext() == null || word.getContext().length() < 2 ||
+                            word.getContext().length() > text.length()) {
+
+                        word.setContext(text);
+                    }
+                }*/
+            }
+        }
+
+        return wordsMap;
+    }
+
+
+
+    public class ParseTextTaskWithConcurrentMap extends RecursiveTask<Map<String, WordWithAtomicCounter>> {
+        private int lo;
+        private int hi;
+        private List<String> sentences;
+        private int sequentialThreshold;
+
+        public ParseTextTaskWithConcurrentMap(int lo, int hi, List<String> sentences, int sequentialThreshold) {
+            this.lo = lo;
+            this.hi = hi;
+            this.sentences = sentences;
+            this.sequentialThreshold = sequentialThreshold;
+        }
+
+        @Override
+        protected Map<String, WordWithAtomicCounter> compute() {
+
+            if (hi - lo <= sequentialThreshold) {
+                for (int i = lo; i < hi; i++) {
+                    String sentence = sentences.get(i);
+                    getWordsWithConcurrentMap(sentence);
+                }
+
+            } else {
+                int mid = (hi - lo) / 2;
+
+                ParseTextTaskWithConcurrentMap left =
+                        new ParseTextTaskWithConcurrentMap(lo, lo + mid, sentences, sequentialThreshold);
+                left.fork();
+
+                ParseTextTaskWithConcurrentMap right =
+                        new ParseTextTaskWithConcurrentMap(lo + mid, hi, sentences, sequentialThreshold);
+                right.compute();
+                left.join();
+            }
+
+            return wordsMap;
+        }
+
+        @Override
+        public String toString() {
+            return "ParseTextTask{" +
+                    "lo=" + lo +
+                    ", hi=" + hi +
+                    ", sequentialThreshold=" + sequentialThreshold +
+                    '}';
+        }
+    }
+
+
+
     public class ParseTextTask extends RecursiveTask<Map<String, Word>> {
 
         private int lo;

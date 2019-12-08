@@ -50,7 +50,9 @@ public class BookAnalysisBenchmark {
         bookParser.futures(sentences);
     }
 
-    public void concurrentMapWithAtomics() {
-
+    @Benchmark
+    public void concurrentMapWithAtomicsUsingForkJoin() {
+        BookTextParser bookParser = new BookTextParser();
+        bookParser.concurrentMapWithAtomicsUsingForkJoin(sentences);
     }
 }
