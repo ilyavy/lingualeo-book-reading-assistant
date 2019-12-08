@@ -55,4 +55,10 @@ public class BookAnalysisBenchmark {
         BookTextParser bookParser = new BookTextParser();
         bookParser.concurrentMapWithAtomicsUsingForkJoin(sentences);
     }
+
+    @Benchmark
+    public void concurrentMapWithAtomicsUsingFuturesAndPhasers() throws ExecutionException, InterruptedException {
+        BookTextParser bookParser = new BookTextParser();
+        bookParser.concurrentMapWithAtomicsUsingFuturesAndPhasers(sentences);
+    }
 }

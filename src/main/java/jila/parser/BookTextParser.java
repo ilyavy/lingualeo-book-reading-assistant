@@ -10,6 +10,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -317,6 +318,37 @@ public class BookTextParser {
         printt(words);
     }
 
+    Phaser phaser = new Phaser();
+
+    public void concurrentMapWithAtomicsUsingFuturesAndPhasers(List<String> sentences) throws ExecutionException, InterruptedException {
+        final int step = (int) Math.ceil(sentences.size() / Double.valueOf(Runtime.getRuntime().availableProcessors()));
+
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+        for (int i = 0; i < sentences.size(); i = i + step) {
+            int lo = i;
+            int hi = Math.min(i + step, sentences.size());
+            futures.add(CompletableFuture.runAsync(() -> getWordsInFutureWithConcurrentMap(sentences, lo, hi)));
+        }
+
+        for (CompletableFuture<Void> f : futures) {
+            f.get();
+        }
+
+        printt(new ArrayList<>(wordsMap.values()));
+    }
+
+
+    protected void getWordsInFutureWithConcurrentMap(List<String> sentences, int lo, int hi) {
+        Map<String, Word> map = new HashMap<>();
+        for (int i = lo; i < hi; i++) {
+            String sentence = sentences.get(i);
+            getWordsWithConcurrentMap(sentence);
+        }
+
+        // System.out.println("!--- finished: " + lo + ", " + hi);
+    }
+
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         BookTextParser bookParser = new BookTextParser();
 
@@ -327,7 +359,7 @@ public class BookTextParser {
         System.out.println("The number of sentences: " + sentences.size());
         text = null;
 
-        new BookTextParser().concurrentMapWithAtomicsUsingForkJoin(sentences);
+        new BookTextParser().concurrentMapWithAtomicsUsingFuturesAndPhasers(sentences);
 
         /*CompletableFuture<List<Word>> f1 = CompletableFuture.supplyAsync(() -> {
             List<Word> result = null;
