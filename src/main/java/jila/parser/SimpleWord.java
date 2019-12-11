@@ -1,7 +1,5 @@
 package jila.parser;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * Represents word entity.
  * It is an abstract class. It does not implement functionality
@@ -9,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * How to store and work with context should be decided in the concrete
  * implementations. It can be array, list, map or anything else.
  */
-public class WordWithAtomicCounter extends Word {
+public class SimpleWord extends Word {
 
     /**
      * The context is stored as an array of Word objects.
@@ -21,18 +19,24 @@ public class WordWithAtomicCounter extends Word {
     /**
      * How much word has been found in the text.
      */
-    private final AtomicLong count = new AtomicLong(0);
+    private long count = 0;
+
+    /**
+     * The default constructor.
+     */
+    public SimpleWord() {
+    }
 
     /**
      * Creates the word entity by its string value.
      *
      * @param word string representation of the word
      */
-    public WordWithAtomicCounter(final String word) {
+    public SimpleWord(final String word) {
         super(word);
     }
 
-    public WordWithAtomicCounter(final String word, final String context) {
+    public SimpleWord(final String word, final String context) {
         super(word, context);
     }
 
@@ -53,7 +57,7 @@ public class WordWithAtomicCounter extends Word {
      *                sentence, where the word has been used.
      */
     @Override
-    public WordWithAtomicCounter setContext(final String context) {
+    public Word setContext(final String context) {
         this.context = context;
         return this;
     }
@@ -63,9 +67,8 @@ public class WordWithAtomicCounter extends Word {
      *
      * @return how much times the word has been found in the text
      */
-    @Override
     public long getCount() {
-        return count.get();
+        return count;
     }
 
     /**
@@ -74,13 +77,23 @@ public class WordWithAtomicCounter extends Word {
      * @param newCount a new value for the cound field
      */
     @Override
-    public WordWithAtomicCounter setCount(final long newCount) {
-        count.set(newCount);
+    public Word setCount(final long newCount) {
+        count = newCount;
         return this;
     }
 
     @Override
     public long incrementCount() {
-        return count.incrementAndGet();
+        return count++;
+    }
+
+    /**
+     * Transforms the word into a string.
+     *
+     * @return the string form of the word entity
+     */
+    @Override
+    public String toString() {
+        return getWord() + " :: " + getCount();
     }
 }
