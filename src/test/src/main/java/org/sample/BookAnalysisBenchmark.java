@@ -29,7 +29,7 @@ public class BookAnalysisBenchmark {
         String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
 
         BookTextParser bp = new BookTextParser();
-        sentences = bp.getSentences(text);
+        sentences = bp.parseTextIntoSentences(text);
     }
 
     @Benchmark

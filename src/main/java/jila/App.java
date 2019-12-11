@@ -28,6 +28,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import jila.parser.BookTextParser;
+import jila.parser.SimpleSequentialBookTextParser;
 import jila.parser.Word;
 import jila.reader.BookFileReader;
 import org.w3c.dom.Document;
@@ -152,10 +153,11 @@ public class App extends Application {
             if (selectedFile == null)
                 return;
 
-            BookTextParser bp = new BookTextParser();
             BookFileReader reader = BookFileReader.createInstance(selectedFile.getAbsolutePath());
+            BookTextParser bp = new SimpleSequentialBookTextParser();
             try {
-                words = bp.parse(reader.readIntoString());
+                List<String> sentences = bp.parseTextIntoSentences(reader.readIntoString());
+                // TODO: words = bp.countWords(sentences).values();
             } catch (IOException e) {
                 e.printStackTrace();
                 // TODO: log and show error window

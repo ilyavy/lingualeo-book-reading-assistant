@@ -16,7 +16,7 @@ import javax.json.JsonObjectBuilder;
  * How to store and work with context should be decided in the concrete
  * implementations. It can be array, list, map or anything else.
  */
-public class Word implements Comparable<Word>, Jsonable {
+public abstract class Word implements Comparable<Word>, Jsonable {
     /**
      * String value of word entity.
      */
@@ -28,21 +28,9 @@ public class Word implements Comparable<Word>, Jsonable {
     private String translate = "";
 
     /**
-     * The context is stored as an array of Word objects.
-     * The order of the words in the array is the same as
-     * the order in the original sentence.
-     */
-    private String context = null;
-
-    /**
      * The flag, which shows either the word is known by the user or not.
      */
     private boolean known = false;
-
-    /**
-     * How much word has been found in the text.
-     */
-    private long count = 1;
 
     /**
      * The default constructor.
@@ -58,14 +46,9 @@ public class Word implements Comparable<Word>, Jsonable {
         setWord(word);
     }
 
-    /**
-     * Creates the word entity by its string value and translation.
-     * @param word  string representation of the word
-     * @param translate the translation of the word
-     */
-    public Word(final String word, final String translate) {
+    public Word(final String word, final String context) {
         this(word);
-        setTranslate(translate);
+        setContext(context);
     }
 
 
@@ -90,18 +73,14 @@ public class Word implements Comparable<Word>, Jsonable {
      * has been used) as a string object.
      * @return
      */
-    public String getContext() {
-        return context;
-    }
+    public abstract String getContext();
 
     /**
      * Sets a context to the word.
      * @param context   the array of Word objects, forming the
      *                  sentence, where the word has been used.
      */
-    public void setContext(final String context) {
-        this.context = context;
-    }
+    public abstract Word setContext(String context);
 
     /**
      * Returns the value of the known flag.
@@ -116,9 +95,7 @@ public class Word implements Comparable<Word>, Jsonable {
      * Returns the value of the count.
      * @return how much times the word has been found in the text
      */
-    public long getCount() {
-        return count;
-    }
+    public abstract long getCount();
 
     /**
      * Sets the new value for string representation of the word.
@@ -126,33 +103,36 @@ public class Word implements Comparable<Word>, Jsonable {
      * inside the class.
      * @param word  a string representation of the word
      */
-    protected void setWord(final String word) {
+    protected Word setWord(final String word) {
         this.word = word.toLowerCase();
+        return this;
     }
 
     /**
      * Sets the new translation of the word.
      * @param translate the tranlsation of the word
      */
-    public void setTranslate(final String translate) {
+    public Word setTranslate(final String translate) {
         this.translate = translate;
+        return this;
     }
 
     /**
      * Sets the new value for the known flag.
      * @param known boolean value of the known flag
      */
-    public void setKnown(final boolean known) {
+    public Word setKnown(final boolean known) {
         this.known = known;
+        return this;
     }
 
     /**
      * Sets new value for the count field.
      * @param newCount  a new value for the cound field
      */
-    public void setCount(final long newCount) {
-        count = newCount;
-    }
+    public abstract Word setCount(final long newCount);
+
+    public abstract long incrementCount();
 
     /**
      * Transforms the word into a string.
@@ -185,7 +165,7 @@ public class Word implements Comparable<Word>, Jsonable {
             return false;
         }
         Word that = (Word) o;
-        if (word.equals(that.word) && count == that.count) {
+        if (word.equals(that.word) && getCount() == that.getCount()) {
             return true;
         }
         return false;
@@ -251,8 +231,8 @@ public class Word implements Comparable<Word>, Jsonable {
          */
         @Override
         public int compare(final Word o1, final Word o2) {
-            Long c1 = Long.valueOf(o1.count);
-            Long c2 = Long.valueOf(o2.count);
+            Long c1 = Long.valueOf(o1.getCount());
+            Long c2 = Long.valueOf(o2.getCount());
             return c1.compareTo(c2);
         }
     }
