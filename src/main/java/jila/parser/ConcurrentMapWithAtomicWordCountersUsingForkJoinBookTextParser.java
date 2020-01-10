@@ -25,7 +25,7 @@ public class ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser exte
     }
 
     @Override
-    protected void parseSentence(final String sentence, final Map<String, Word> wordsMap) {
+    protected Map<String, Word> parseSentence(final String sentence, final Map<String, Word> wordsMap) {
         Pattern splitter = Pattern.compile(PATTERN);
         Matcher m = splitter.matcher(sentence);
 
@@ -40,6 +40,8 @@ public class ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser exte
                 word.incrementCount();
             }
         }
+
+        return wordsMap;
     }
 
     class ParseSentencesTaskWithConcurrentMap extends RecursiveTask<Map<String, Word>> {

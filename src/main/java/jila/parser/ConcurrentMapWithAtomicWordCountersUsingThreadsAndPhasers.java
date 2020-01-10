@@ -2,13 +2,12 @@ package jila.parser;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Phaser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConcurrentMapWithAtomicWordCountersUsingFuturesAndPhasers extends BookTextParser {
+public class ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhasers extends BookTextParser {
 
     @Override
     public Map<String, Word> countWords(final List<String> sentences) {
@@ -21,12 +20,12 @@ public class ConcurrentMapWithAtomicWordCountersUsingFuturesAndPhasers extends B
         for (int i = 0; i < sentences.size(); i = i + step) {
             int lo = i;
             int hi = Math.min(i + step, sentences.size());
-            CompletableFuture.runAsync(() -> {
+            new Thread(() -> {
                 for (int j = lo; j < hi; j++) {
                     parseSentence(sentences.get(j), wordsMap);
                 }
                 phaser.arriveAndDeregister();
-            });
+            }).start();
         }
 
         phaser.arriveAndAwaitAdvance();
@@ -34,7 +33,7 @@ public class ConcurrentMapWithAtomicWordCountersUsingFuturesAndPhasers extends B
     }
 
     @Override
-    protected void parseSentence(final String sentence, final Map<String, Word> wordsMap) {
+    protected Map<String, Word> parseSentence(final String sentence, final Map<String, Word> wordsMap) {
         Pattern splitter = Pattern.compile(PATTERN);
         Matcher m = splitter.matcher(sentence);
 
@@ -49,5 +48,7 @@ public class ConcurrentMapWithAtomicWordCountersUsingFuturesAndPhasers extends B
                 word.incrementCount();
             }
         }
+
+        return wordsMap;
     }
 }
