@@ -6,9 +6,10 @@ import java.util.concurrent.TimeUnit;
 
 import jila.parser.BookTextParser;
 import jila.parser.ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser;
-import jila.parser.ConcurrentMapWithAtomicWordCountersUsingFuturesAndPhasers;
+import jila.parser.ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhasers;
 import jila.parser.ForkJoinBookTextParser;
 import jila.parser.FuturesBookTextParser;
+import jila.parser.ParallelStreamsBookTextParser;
 import jila.parser.SimpleSequentialBookTextParser;
 import jila.reader.BookFileReader;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -62,7 +63,13 @@ public class BookAnalysisBenchmark {
 
     @Benchmark
     public void concurrentMapWithAtomicsUsingFuturesAndPhasers() {
-        BookTextParser bookParser = new ConcurrentMapWithAtomicWordCountersUsingFuturesAndPhasers();
+        BookTextParser bookParser = new ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhasers();
+        bookParser.countWords(sentences);
+    }
+
+    @Benchmark
+    public void parallelStreams() {
+        BookTextParser bookParser = new ParallelStreamsBookTextParser();
         bookParser.countWords(sentences);
     }
 }

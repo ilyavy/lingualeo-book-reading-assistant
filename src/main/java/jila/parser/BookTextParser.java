@@ -119,7 +119,7 @@ public abstract class BookTextParser {
         return false;
     }
 
-    protected void parseSentence(final String sentence, final Map<String, Word> wordsMap) {
+    protected Map<String, Word> parseSentence(final String sentence, final Map<String, Word> wordsMap) {
         Pattern splitter = Pattern.compile(PATTERN);
         Matcher m = splitter.matcher(sentence);
 
@@ -132,10 +132,12 @@ public abstract class BookTextParser {
                 word.incrementCount();
             }
         }
+
+        return wordsMap;
     }
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
-        BookTextParser bookParser = new ConcurrentMapWithAtomicWordCountersUsingFuturesAndPhasers();
+        BookTextParser bookParser = new ParallelStreamsBookTextParser();
         String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
 
         List<String> sentences = bookParser.parseTextIntoSentences(text);
