@@ -26,4 +26,5 @@ jobs:
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
       - run: mvn test
+      - run: mvn checkstyle:checkstyle
       - run: mvn package
