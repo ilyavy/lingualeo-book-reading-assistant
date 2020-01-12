@@ -7,7 +7,11 @@ import java.util.concurrent.Phaser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhasers extends BookTextParser {
+/**
+ * Book parser, which is similar to {@link ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser},
+ * but uses simple threads instead of ForkJoin Framework to parallelize the job, and a phaser to sync the result.
+ */
+public class ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhaser extends BookTextParser {
 
     @Override
     public Map<String, Word> countWords(final List<String> sentences) {

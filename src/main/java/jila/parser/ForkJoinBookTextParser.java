@@ -30,7 +30,7 @@ public class ForkJoinBookTextParser extends BookTextParser {
 
         private int sequentialThreshold;
 
-        public ParseSentencesTask(int lo, int hi, List<String> sentences, int sequentialThreshold) {
+        ParseSentencesTask(int lo, int hi, List<String> sentences, int sequentialThreshold) {
             this.lo = lo;
             this.hi = hi;
             this.sentences = sentences;
