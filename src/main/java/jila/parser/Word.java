@@ -84,8 +84,7 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Returns the value of the known flag.
-     * @return boolean, either the word is already
-     * known by a user or not
+     * @return boolean, either the word is already known by a user or not
      */
     public boolean isKnown() {
         return known;

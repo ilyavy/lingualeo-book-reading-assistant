@@ -18,12 +18,12 @@ public abstract class BookTextParser {
     /**
      * Regex pattern for finding words in the text.
      */
-    protected final String PATTERN = "[a-zA-Z]+";
+    protected final static String PATTERN = "[a-zA-Z]+";
 
     /**
      * Minimal length of the word, which is accounted for.
      */
-    protected final int WORD_LENGTH_THRESHOLD = 3;
+    protected final static int WORD_LENGTH_THRESHOLD = 3;
 
 
     /**
@@ -53,7 +53,7 @@ public abstract class BookTextParser {
         return sentences;
     }
 
-    public abstract Map<String, Word> countWords(final List<String> sentences);
+    public abstract Map<String, Word> countWords(List<String> sentences);
 
     /**
      * Return the Flesch readability score of this document.
@@ -123,8 +123,6 @@ public abstract class BookTextParser {
         Pattern splitter = Pattern.compile(PATTERN);
         Matcher m = splitter.matcher(sentence);
 
-        wordsMap.put("str", new SimpleWord("", ""));
-
         while (m.find()) {
             String wordStr = m.group().toLowerCase();
             if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
@@ -138,7 +136,7 @@ public abstract class BookTextParser {
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         BookTextParser bookParser = new ParallelStreamsBookTextParser();
-        String text = BookFileReader.createInstance("war-peace.txt").readIntoString();
+        String text = BookFileReader.createInstance("./book-samples/war-peace.txt").readIntoString();
 
         List<String> sentences = bookParser.parseTextIntoSentences(text);
         Map<String, Word> wordsMap = bookParser.countWords(sentences);

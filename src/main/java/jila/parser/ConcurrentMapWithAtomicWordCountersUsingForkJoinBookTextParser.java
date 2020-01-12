@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 /**
  * Book parser, which is similar to {@link ForkJoinBookTextParser}, the differences are: word implementation
- * uses atomic counter and all the words are stored in the concurrent hash map..
+ * uses atomic counter and all the words are stored in the concurrent hash map.
  */
 public class ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser extends BookTextParser {
 
@@ -27,10 +27,10 @@ public class ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser exte
     @Override
     protected Map<String, Word> parseSentence(final String sentence, final Map<String, Word> wordsMap) {
         Pattern splitter = Pattern.compile(PATTERN);
-        Matcher m = splitter.matcher(sentence);
+        Matcher matcher = splitter.matcher(sentence);
 
-        while (m.find()) {
-            String wordStr = m.group().toLowerCase();
+        while (matcher.find()) {
+            String wordStr = matcher.group().toLowerCase();
             if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
                 WordWithAtomicCounter word = (WordWithAtomicCounter) wordsMap.get(wordStr);
                 if (word == null) {
@@ -56,7 +56,7 @@ public class ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser exte
 
         private Map<String, Word> wordsMap;
 
-        public ParseSentencesTaskWithConcurrentMap(int lo, int hi, List<String> sentences, int sequentialThreshold) {
+        ParseSentencesTaskWithConcurrentMap(int lo, int hi, List<String> sentences, int sequentialThreshold) {
             this.lo = lo;
             this.hi = hi;
             this.sentences = sentences;
@@ -64,7 +64,7 @@ public class ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser exte
             this.wordsMap = new ConcurrentHashMap<>();
         }
 
-        public ParseSentencesTaskWithConcurrentMap(
+        ParseSentencesTaskWithConcurrentMap(
                 int lo, int hi, List<String> sentences, int sequentialThreshold, Map<String, Word> wordsMap) {
 
             this.lo = lo;

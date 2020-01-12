@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -37,13 +38,15 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
-
+/**
+ * Entry point for a GUI-rich application.
+ */
 public class App extends Application {
     private WebView browser;
     private WebEngine webEngine;
     private LingualeoApi leo;
 
-    private final int ITEMS_ON_PAGE = 6;
+    private final static int ITEMS_ON_PAGE = 6;
     private List<? extends Word> words;
 
     @Override
@@ -150,8 +153,9 @@ public class App extends Application {
             File selectedFile = fileChooser.showOpenDialog(stage);
 
             // Parse book's file, if the file was chosen
-            if (selectedFile == null)
+            if (selectedFile == null) {
                 return;
+            }
 
             BookFileReader reader = BookFileReader.createInstance(selectedFile.getAbsolutePath());
             BookTextParser bp = new SimpleSequentialBookTextParser();

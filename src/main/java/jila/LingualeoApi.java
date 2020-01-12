@@ -20,7 +20,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Provide the way to work with lingualeo api.
  */
 public class LingualeoApi {
-    private final String LLDOMAIN = "https://api.lingualeo.com/";
+    private final static String LLDOMAIN = "https://api.lingualeo.com/";
     private Connector conn;
     private String cookie;
     
@@ -45,22 +45,22 @@ public class LingualeoApi {
      * Create LingualeoApi object, using cookie.
      * Invoke of login method is not necessary after that.
      * @param connector - specified connector.
-     * @param Cookie - cookie string.
+     * @param cookie - cookie string.
      */
-    public LingualeoApi(final Connector connector, final String Cookie) {
+    public LingualeoApi(final Connector connector, final String cookie) {
         this(connector);
-        cookie = Cookie;
+        this.cookie = cookie;
     }
     
     /**
      * If credentials were saved before in cookie, login can be done,
      * using that cookie.
-     * @param Cookie - String, containing user's credentials. The main key is
+     * @param cookie - String, containing user's credentials. The main key is
      * remember. Any other keys are not necessary.
      * @return JsonObject, containing user's profile data.
      */
-    public JsonObject login(final String Cookie) {
-        cookie = Cookie;
+    public JsonObject login(final String cookie) {
+        this.cookie = cookie;
         String link = LLDOMAIN + "api/login";
         String res = "{\"error_msg\":\"\",\"user\":{\"user_id\":3488533,\"nickname\":\"ilvolos\",\"xp_level\":13,\"hungry_pct\":0,\"words_cnt\":1057,\"words_known\":6765}}";
         JsonReader jreader = Json.createReader(new StringReader(res));
@@ -147,7 +147,7 @@ public class LingualeoApi {
      * It can use specified proxy or work directly, without it.
      */
     private static class ConcreteConnector implements Connector {
-        private final int TIMEOUT = 1000;
+        private final static int TIMEOUT = 1000;
         private String pType = null;
         private String pHost;
         private int pPort;
@@ -170,7 +170,7 @@ public class LingualeoApi {
         
         /**
          * Get response from the specified url.
-         * @param - string with url.
+         * @param link - string with url.
          * @return - JsonObject, that contains the server's answer.
          */
         public HttpURLConnection getResponse(final String link, final String cookie) {
@@ -188,18 +188,9 @@ public class LingualeoApi {
                 } else {
                     urlConn = (HttpsURLConnection) url.openConnection();
                 }
-                
-                //String myCookie = "AWSELB=81E385C912B24FF6E77010EAF57B6254C98AA295E0628BCCEF3EF601DA2D4E0F4BCC90FFA804FD467E5809C1BE27F34BFE94E43E9667578E010D836ACD47EED6C34753DEE1589273F8DB418D6D004080193E1A1F76;PATH=/;DOMAIN=lingualeo.com;HTTPONLY";
-                //String myCookie = "userid=3488533; lingualeouid=1430385637432046; lang=ru; iface=ru";
+
                 StringBuilder sb = new StringBuilder();
-                //sb.append("firstseen=2016/07/29;");
-                //sb.append("lingualeouid=1469796232872346;");
-                //sb.append("lang=ru;");
-                //sb.append("iface=ru;");
-                //sb.append("userid=3488533;");
-                //sb.append("servid=6401000a4f3b3371bac53839f608d68e7cb2d2260e2a20dc4b9f56c74a870349686e956c657aba9e;");
                 sb.append("remember=153b3500f876710c9ba2fbea030d95d975b3f528f2e299e10f7e35ded9347bcd8925398f6f61fb87;"); //neccessary
-                //sb.append("AWSELB=81E385C912B24FF6E77010EAF57B6254C98AA295E0E7AAC86589F3B92E04F1A3A43FF8BFF3523289B745EA9832CF0A6A849246AB80D8E5B7FA175A6611EF7317C787F935ACB82A37669D4275B61753A7F14F93D03E");
                 
                 //Cookie
                 if (cookie != null && !cookie.isEmpty()) {

@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import jila.parser.BookTextParser;
 import jila.parser.ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser;
-import jila.parser.ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhasers;
+import jila.parser.ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhaser;
 import jila.parser.ForkJoinBookTextParser;
 import jila.parser.FuturesBookTextParser;
 import jila.parser.ParallelStreamsBookTextParser;
@@ -31,7 +31,7 @@ public class BookAnalysisBenchmark {
 
     @Setup
     public void setup() throws IOException {
-        String text = BookFileReader.createInstance("../war-peace.txt").readIntoString();
+        String text = BookFileReader.createInstance("../book-samples/war-peace.txt").readIntoString();
 
         BookTextParser bp = new SimpleSequentialBookTextParser();
         sentences = bp.parseTextIntoSentences(text);
@@ -63,7 +63,7 @@ public class BookAnalysisBenchmark {
 
     @Benchmark
     public void concurrentMapWithAtomicsUsingFuturesAndPhasers() {
-        BookTextParser bookParser = new ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhasers();
+        BookTextParser bookParser = new ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhaser();
         bookParser.countWords(sentences);
     }
 
