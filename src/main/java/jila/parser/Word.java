@@ -129,7 +129,7 @@ public abstract class Word implements Comparable<Word>, Jsonable {
      * Sets new value for the count field.
      * @param newCount  a new value for the cound field
      */
-    public abstract Word setCount(final long newCount);
+    public abstract Word setCount(long newCount);
 
     public abstract long incrementCount();
 
@@ -155,15 +155,15 @@ public abstract class Word implements Comparable<Word>, Jsonable {
     /**
      * Returns true if this and that word are equal in the
      * meaning of their string representations and the count values.
-     * @param o the word to be compared with
+     * @param obj the word to be compared with
      * @return  boolean, equal or not
      */
     @Override
-    public boolean equals(final Object o) {
-        if (!(o instanceof Word)) {
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof Word)) {
             return false;
         }
-        Word that = (Word) o;
+        Word that = (Word) obj;
         if (word.equals(that.word) && getCount() == that.getCount()) {
             return true;
         }

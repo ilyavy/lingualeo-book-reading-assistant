@@ -39,10 +39,10 @@ public class ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhaser extends Bo
     @Override
     protected Map<String, Word> parseSentence(final String sentence, final Map<String, Word> wordsMap) {
         Pattern splitter = Pattern.compile(PATTERN);
-        Matcher m = splitter.matcher(sentence);
+        Matcher matcher = splitter.matcher(sentence);
 
-        while (m.find()) {
-            String wordStr = m.group().toLowerCase();
+        while (matcher.find()) {
+            String wordStr = matcher.group().toLowerCase();
             if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
                 WordWithAtomicCounter word = (WordWithAtomicCounter) wordsMap.get(wordStr);
                 if (word == null) {

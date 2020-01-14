@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * Reads simple txt files with the extension ".txt".
+ */
 class TxtFileReader extends BookFileReader {
 
     TxtFileReader(final String filePath) {

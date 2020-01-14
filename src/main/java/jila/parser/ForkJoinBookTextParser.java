@@ -20,6 +20,9 @@ public class ForkJoinBookTextParser extends BookTextParser {
         return task.compute();
     }
 
+    /**
+     * Recursive task's implementation, splits the job up to sequentialThreshold specified.
+     */
     class ParseSentencesTask extends RecursiveTask<Map<String, Word>> {
 
         private int lo;

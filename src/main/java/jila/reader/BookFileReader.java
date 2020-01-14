@@ -3,6 +3,9 @@ package jila.reader;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Abstract file reader with static factory to create a concrete instance.
+ */
 public abstract class BookFileReader {
 
     String filePath;
@@ -13,6 +16,13 @@ public abstract class BookFileReader {
 
     public abstract String readIntoString() throws IOException;
 
+    /**
+     * Creates a concrete book file reader by the specified file path. A concrete implementation is chosen based
+     * on the file's extension.
+     *
+     * @param filePath path to the file to read
+     * @return
+     */
     public static BookFileReader createInstance(final String filePath) {
         File file = new File(filePath);
 

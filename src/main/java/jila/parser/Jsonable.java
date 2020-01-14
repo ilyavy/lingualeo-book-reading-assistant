@@ -4,7 +4,11 @@ import java.util.Map;
 
 import javax.json.JsonObject;
 
+/**
+ * Interface used to serialize object into json object.
+ * TODO: remove
+ */
 public interface Jsonable {
-    public JsonObject toJsonObject();
-    public JsonObject toJsonObject(Map<String, String> attributes);
+    JsonObject toJsonObject();
+    JsonObject toJsonObject(Map<String, String> attributes);
 }

@@ -44,6 +44,9 @@ public class ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser exte
         return wordsMap;
     }
 
+    /**
+     * Recursive task's implementation, splits the job up to sequentialThreshold.
+     */
     class ParseSentencesTaskWithConcurrentMap extends RecursiveTask<Map<String, Word>> {
 
         private int lo;
