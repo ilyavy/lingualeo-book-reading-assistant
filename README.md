@@ -22,7 +22,7 @@ The application will start in a new window.
 
 ## Project's structure
 ```
-├── src/main    # source-set of the appliaction
-├── src/perf    # source-set of the performance benchmark, measures the speed of work of different book text parsers
-
+├── src/main      # source-set of the appliaction
+├── src/perf      # source-set of the performance benchmark
+├── book-samples  # books samples
 ```
