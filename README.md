@@ -25,5 +25,5 @@ The application will start in a new window.
 ├── src
     └── main      # source-set of the appliaction
     └── perf      # source-set of the performance benchmark
-├── book-samples  # books samples
+└── book-samples  # books samples
 ```
