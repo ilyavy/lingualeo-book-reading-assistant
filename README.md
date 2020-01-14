@@ -1,7 +1,13 @@
-Система анализа электронных книг, с помощью которой можно выявить наиболее часто встречающиеся в книге слова и добавить их на изучение в систему изучения английского языка lingualeo.ru. 
+# English books reader helper
+The GUI application allows to analyze English books and add the most frequently used in the text words into https://lingualeo.com dictionary for further learning.
 
-Распознаются только книги в формате .txt. 
+It is supposed that it will help to learn the most frequently used words before reading the book, to make reading experience more smooth and enjoyable.
 
-Команда для билдинга проекта - "mvn package".
+**Supported book formats:**
+- txt
 
-В корне две книги для примера.
+## Usage
+The application is distributed via jar-file.
+
+
+## Project's structure
