@@ -9,5 +9,20 @@ It is supposed that it will help to learn the most frequently used words before 
 ## Usage
 The application is distributed via jar-file.
 
+In order to build the executable jar-file from the sources, it's needed to use the command:
+```shell
+mvn package
+```
+Then jar-file can be launched from the `target` directory:
+```shell
+java -jar lingualeo-book-reading-helper.jar
+```
+
+The application will start in a new window.
 
 ## Project's structure
+```
+├── src/main    # source-set of the appliaction
+├── src/perf    # source-set of the performance benchmark, measures the speed of work of different book text parsers
+
+```
