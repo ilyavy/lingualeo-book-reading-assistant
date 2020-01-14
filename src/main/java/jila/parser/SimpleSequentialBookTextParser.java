@@ -9,14 +9,14 @@ import java.util.Map;
  */
 public class SimpleSequentialBookTextParser extends BookTextParser {
 
-	@Override
-	public Map<String, Word> countWords(final List<String> sentences) {
-		Map<String, Word> wordsMap = new HashMap<>();
+    @Override
+    public Map<String, Word> countWords(final List<String> sentences) {
+        Map<String, Word> wordsMap = new HashMap<>();
 
-		for (String sentence : sentences) {
-			parseSentence(sentence, wordsMap);
-		}
+        for (String sentence : sentences) {
+            parseSentence(sentence, wordsMap);
+        }
 
-		return wordsMap;
-	}
+        return wordsMap;
+    }
 }

@@ -46,7 +46,7 @@ public class App extends Application {
     private WebEngine webEngine;
     private LingualeoApi leo;
 
-    private final static int ITEMS_ON_PAGE = 6;
+    private static final int ITEMS_ON_PAGE = 6;
     private List<? extends Word> words;
 
     @Override
@@ -233,6 +233,9 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Adds words to the user's dictionary.
+     */
     protected class ButtonAddWordsListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {
@@ -264,7 +267,9 @@ public class App extends Application {
 
     }
 
-
+    /**
+     * Displays the specified page of results for a user.
+     */
     protected class ButtonPaginatorGoListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {
@@ -274,7 +279,9 @@ public class App extends Application {
         }
     }
 
-
+    /**
+     * Displays the previous page of results for a user.
+     */
     protected class ButtonPaginatorPreviousListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {
@@ -284,6 +291,9 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Displays the next page of results for a user.
+     */
     protected class ButtonPaginatorNextListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {
@@ -293,7 +303,9 @@ public class App extends Application {
         }
     }
 
-
+    /**
+     * Opens links to external resources in a browser set by default in a system.
+     */
     protected class LinkExternalListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {

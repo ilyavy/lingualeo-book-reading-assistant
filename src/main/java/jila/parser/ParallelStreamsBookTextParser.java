@@ -21,8 +21,12 @@ public class ParallelStreamsBookTextParser extends BookTextParser {
                 .flatMap(Collection::stream)
                 .collect(Collectors.groupingByConcurrent(Word::getWord,
                         Collectors.reducing(null, (w1, w2) -> {
-                            if (w1 == null) return w2;
-                            if (w2 == null) return w1;
+                            if (w1 == null) {
+                                return w2;
+                            }
+                            if (w2 == null) {
+                                return w1;
+                            }
 
                             w1.incrementCount();
                             return w1;
@@ -33,11 +37,11 @@ public class ParallelStreamsBookTextParser extends BookTextParser {
 
     private List<Word> parseSentence(final String sentence) {
         Pattern splitter = Pattern.compile(PATTERN);
-        Matcher m = splitter.matcher(sentence);
+        Matcher matcher = splitter.matcher(sentence);
         List<Word> list = new ArrayList<>();
 
-        while (m.find()) {
-            String wordStr = m.group().toLowerCase();
+        while (matcher.find()) {
+            String wordStr = matcher.group().toLowerCase();
             if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
                 Word word = new SimpleWord(wordStr, sentence);
                 word.incrementCount();

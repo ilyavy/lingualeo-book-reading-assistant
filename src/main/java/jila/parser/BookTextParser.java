@@ -18,12 +18,12 @@ public abstract class BookTextParser {
     /**
      * Regex pattern for finding words in the text.
      */
-    protected final static String PATTERN = "[a-zA-Z]+";
+    protected static final String PATTERN = "[a-zA-Z]+";
 
     /**
      * Minimal length of the word, which is accounted for.
      */
-    protected final static int WORD_LENGTH_THRESHOLD = 3;
+    protected static final int WORD_LENGTH_THRESHOLD = 3;
 
 
     /**
@@ -43,10 +43,10 @@ public abstract class BookTextParser {
     public List<String> parseTextIntoSentences(final String text) {
         List<String> sentences = new ArrayList<>();
         Pattern splitter = Pattern.compile("[^!?.]+");
-        Matcher m = splitter.matcher(text);
+        Matcher matcher = splitter.matcher(text);
 
-        while (m.find()) {
-            String sentence = m.group();
+        while (matcher.find()) {
+            String sentence = matcher.group();
             sentences.add(sentence);
         }
 
@@ -121,10 +121,10 @@ public abstract class BookTextParser {
 
     protected Map<String, Word> parseSentence(final String sentence, final Map<String, Word> wordsMap) {
         Pattern splitter = Pattern.compile(PATTERN);
-        Matcher m = splitter.matcher(sentence);
+        Matcher matcher = splitter.matcher(sentence);
 
-        while (m.find()) {
-            String wordStr = m.group().toLowerCase();
+        while (matcher.find()) {
+            String wordStr = matcher.group().toLowerCase();
             if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
                 Word word = wordsMap.merge(wordStr, new SimpleWord(wordStr, sentence), (w1, w2) -> w1);
                 word.incrementCount();
@@ -134,6 +134,10 @@ public abstract class BookTextParser {
         return wordsMap;
     }
 
+    /**
+     * Debug method.
+     * TODO: remove
+     */
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         BookTextParser bookParser = new ParallelStreamsBookTextParser();
         String text = BookFileReader.createInstance("./book-samples/war-peace.txt").readIntoString();

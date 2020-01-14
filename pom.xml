@@ -12,7 +12,7 @@
         <maven.compiler.target>11</maven.compiler.target>
 
         <!-- Plugins -->
-        <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.1.0</checkstyle-plugin.version>
         <checkstyle.url>https://raw.githubusercontent.com/aukhatov/checkstyle/master/checkstyle.xml</checkstyle.url>
@@ -115,13 +115,15 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <descriptor>perf-tests-assembly.xml</descriptor>
                             <attach>true</attach>
                             <archive>
                                 <manifest>
                                     <mainClass>org.openjdk.jmh.Main</mainClass>
                                 </manifest>
                             </archive>
+                            <descriptors>
+                                <descriptor>perf-tests-assembly.xml</descriptor>
+                            </descriptors>
                         </configuration>
                     </execution>
                 </executions>
