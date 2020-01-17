@@ -23,7 +23,7 @@ The application will start in a new window.
 ## Project's structure
 ```
 ├── src
-    └── main      # source-set of the appliaction
+    └── main      # source-set of the application
     └── perf      # source-set of the performance benchmark
 └── book-samples  # books samples
 ```
