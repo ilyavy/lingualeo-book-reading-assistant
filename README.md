@@ -1,4 +1,4 @@
-# English books reader helper
+# English Book Reading Assistant
 The GUI application allows to analyze English books and add the most frequently used in the text words into https://lingualeo.com dictionary for further learning.
 
 It is supposed that it will help to learn the most frequently used words before reading the book, to make reading experience more smooth and enjoyable.
