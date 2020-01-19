@@ -10,6 +10,7 @@ import jila.parser.ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhaser;
 import jila.parser.ForkJoinBookTextParser;
 import jila.parser.FuturesBookTextParser;
 import jila.parser.ParallelStreamsBookTextParser;
+import jila.parser.ParallelStreamsNaiveBookTextParser;
 import jila.parser.SimpleSequentialBookTextParser;
 import jila.parser.SingleStreamNaiveBookTextParser;
 import jila.reader.BookFileReader;
@@ -63,7 +64,7 @@ public class BookAnalysisBenchmark {
     }
 
     @Benchmark
-    public void concurrentMapWithAtomicsUsingFuturesAndPhasers() {
+    public void concurrentMapWithAtomicsUsingThreadsAndPhaser() {
         BookTextParser bookParser = new ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhaser();
         bookParser.countWords(sentences);
     }
@@ -76,7 +77,7 @@ public class BookAnalysisBenchmark {
 
     @Benchmark
     public void parallelStreamsNaive() {
-        BookTextParser bookParser = new ParallelStreamsBookTextParser();
+        BookTextParser bookParser = new ParallelStreamsNaiveBookTextParser();
         bookParser.countWords(sentences);
     }
 
