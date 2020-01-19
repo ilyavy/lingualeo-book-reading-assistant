@@ -76,7 +76,7 @@ public class BookAnalysisBenchmark {
 
     @Benchmark
     public void parallelStreamsNaive() {
-        BookTextParser bookParser = new ParallelStreamsBookTextParser();
+        BookTextParser bookParser = new ParallelStreamsNaiveBookTextParser();
         bookParser.countWords(sentences);
     }
 
