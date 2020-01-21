@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: 13.0.2-jdk-buster
+      - image: circleci/13.0.2-jdk-buster
 
     working_directory: ~/repo
 
