@@ -9,12 +9,9 @@ It is supposed that it will help to learn the most frequently used words before 
 ## Usage
 The application is distributed via a *jar-file*.
 
-It can be downloaded from the [packages](https://github.com/ilyavy/lingualeo-book-reading-assistant/packages) tab in the repository.
-Asset's name is: `lingualeo-book-reading-assistant-x.x.x.jar`, where `x.x.x` is a version of the app.
-
-It can be launched from the directory, where it was downloaded, using the command:
+It can be downloaded from the [releases](https://github.com/ilyavy/lingualeo-book-reading-assistant/releases) tab in the repository. And then launched from the directory, where it was downloaded, using the command (for the latest release):
 ```shell
-java -jar lingualeo-book-reading-assistant.jar
+java -jar lingualeo-book-reading-assistant-1.0.0.jar
 ```
 The application will start in a new window.
 
@@ -22,7 +19,10 @@ In order to build the executable *jar-file* from the sources, it's needed to use
 ```shell
 mvn package
 ```
-The application then can be run from `target` directory with the command shown before. 
+The application then can be run from `target` directory with the command:
+```shell
+java -jar lingualeo-book-reading-assistant.jar
+```
 
 ## Project's structure
 ```
