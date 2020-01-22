@@ -7,9 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -161,7 +160,7 @@ public class App extends Application {
             BookTextParser bp = new SimpleSequentialBookTextParser();
             try {
                 List<String> sentences = bp.parseTextIntoSentences(reader.readIntoString());
-                // TODO: words = bp.countWords(sentences).values();
+                words = new ArrayList<>(bp.countWords(sentences).values());
             } catch (IOException e) {
                 e.printStackTrace();
                 // TODO: log and show error window

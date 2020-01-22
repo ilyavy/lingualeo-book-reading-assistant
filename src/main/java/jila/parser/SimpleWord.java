@@ -14,7 +14,7 @@ public class SimpleWord extends Word {
      * The order of the words in the array is the same as
      * the order in the original sentence.
      */
-    private String context = null;
+    private String context;
 
     /**
      * How much word has been found in the text.
