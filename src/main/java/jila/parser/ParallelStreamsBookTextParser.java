@@ -16,7 +16,7 @@ public class ParallelStreamsBookTextParser extends BookTextParser {
     @Override
     public Map<String, Word> countWords(List<String> sentences) {
         Map<String, Word> wordsMap = sentences
-                .stream()
+                .parallelStream()
                 .map(this::parseSentence)
                 .flatMap(Collection::stream)
                 .collect(Collectors.groupingByConcurrent(Word::getWord,
