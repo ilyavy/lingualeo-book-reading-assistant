@@ -12,23 +12,17 @@ import java.util.stream.Collectors;
 /**
  * Book parser, which uses parallel streams to parallelize the job..
  */
-public class ParallelStreamsBookTextParser extends BookTextParser {
+public class ParallelStreamsWithOnlyFlatmapBookTextParser extends BookTextParser {
 
     @Override
     public Map<String, Word> countWords(List<String> sentences) {
         Map<String, Word> wordsMap = sentences
                 .parallelStream()
-                .unordered()
-                .map(this::parseSentence)
-                .flatMap(Collection::stream)
+                .flatMap(s -> this.parseSentence(s).stream())
                 .collect(Collectors.toConcurrentMap(Word::getWord, Function.identity(), (w1, w2) -> {
                     w1.incrementCount();
                     return w1;
                 }));
-
-
-        // TODO: test all the parsers around the boundary -- N = 10000 sentences and probably around N = 8000 sentences
-        // https://developer.ibm.com/articles/j-java-streams-5-brian-goetz/
 
         return wordsMap;
     }
