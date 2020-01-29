@@ -25,6 +25,12 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "pom.xml" }}
 
-      - run: mvn test
+      # Static analysis
       - run: mvn checkstyle:checkstyle
+
+      # Unit tests
+      - run: mvn test
+      - run: bash <(curl -s https://codecov.io/bash)
+
+      # Package
       - run: mvn package
