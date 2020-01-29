@@ -1,5 +1,7 @@
 package jila.parser;
 
+import jila.reader.BookFileReader;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import jila.reader.BookFileReader;
 
 /**
  * Utility class. Allows to parse a text of a specified book.

@@ -4,29 +4,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import jila.parser.BookTextParser;
-import jila.parser.ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser;
-import jila.parser.ConcurrentMapWithAtomicWordCountersUsingThreadsAndPhaser;
-import jila.parser.ForkJoinBookTextParser;
-import jila.parser.FuturesBookTextParser;
-import jila.parser.ParallelStreamsBookTextParser;
-import jila.parser.ParallelStreamsNaiveBookTextParser;
-import jila.parser.SimpleSequentialBookTextParser;
-import jila.parser.SingleStreamNaiveBookTextParser;
+import jila.parser.*;
 import jila.reader.BookFileReader;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.*;
 
-@BenchmarkMode(Mode.All)
+@BenchmarkMode({Mode.SampleTime, Mode.AverageTime})
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx2G"})
+@Fork(value = 2, warmups = 5, jvmArgs = {"-Xms2G", "-Xmx2G"})
 public class BookAnalysisBenchmark {
 
     private List<String> sentences;
@@ -84,6 +69,24 @@ public class BookAnalysisBenchmark {
     @Benchmark
     public void parallelStreams() {
         BookTextParser bookParser = new ParallelStreamsBookTextParser();
+        bookParser.countWords(sentences);
+    }
+
+    @Benchmark
+    public void parallelStreamsWithOnlyFlatmap() {
+        BookTextParser bookParser = new ParallelStreamsWithOnlyFlatmapBookTextParser();
+        bookParser.countWords(sentences);
+    }
+
+    @Benchmark
+    public void parallelStreamsToMap() {
+        BookTextParser bookParser = new ParallelStreamsToMapBookTextParser();
+        bookParser.countWords(sentences);
+    }
+
+    @Benchmark
+    public void parallelStreamsGroupingBy() {
+        BookTextParser bookParser = new ParallelStreamsGroupingByBookTextParser();
         bookParser.countWords(sentences);
     }
 }
