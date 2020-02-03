@@ -82,8 +82,7 @@ public class LingualeoApi {
      * @return JsonObject, containing user's profile data.
      */
     public JsonObject login(final String email, final String password) {
-        String link = LLDOMAIN + "login?email=" +
-                email + "&password=" + password;
+        String link = LLDOMAIN + "login?email=" + email + "&password=" + password; // TODO: use WebFlux
         System.out.println(link);
         HttpURLConnection urlConn = conn.getResponse(link, null);
         cookie = conn.extractCookie(urlConn);
