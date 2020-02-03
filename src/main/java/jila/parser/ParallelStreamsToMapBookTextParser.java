@@ -26,6 +26,11 @@ public class ParallelStreamsToMapBookTextParser extends BookTextParser {
                 }));
     }
 
+    /**
+     * Parses a sentence into a list of words.
+     * @param sentence  a sentence
+     * @return  list of words
+     */
     public List<Word> parseSentence(final String sentence) {
         Pattern splitter = Pattern.compile(PATTERN);
         Matcher matcher = splitter.matcher(sentence);

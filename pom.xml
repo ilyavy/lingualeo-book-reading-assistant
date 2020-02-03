@@ -18,7 +18,7 @@
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.1.0</checkstyle-plugin.version>
-        <checkstyle.url>https://raw.githubusercontent.com/aukhatov/checkstyle/master/checkstyle.xml</checkstyle.url>
+        <checkstyle.url>https://raw.githubusercontent.com/ilyavy/checkstyle/master/checkstyle.xml</checkstyle.url>
         <jacoco-plugin.version>0.8.5</jacoco-plugin.version>
     </properties>
 
