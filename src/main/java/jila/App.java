@@ -1,24 +1,7 @@
 package jila;
 
-import java.awt.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.net.URL;
-import java.util.*;
-import java.util.List;
-
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-
 import javafx.application.Application;
-import javafx.concurrent.Task;
+import javafx.application.Platform;
 import javafx.concurrent.Worker.State;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
@@ -36,6 +19,19 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+import javax.json.*;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.net.URL;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * Entry point for a GUI-rich application.
@@ -46,7 +42,7 @@ public class App extends Application {
     private LingualeoApi leo;
 
     private static final int ITEMS_ON_PAGE = 6;
-    private List<? extends Word> words;
+    private volatile List<? extends Word> words;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -85,7 +81,6 @@ public class App extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 
     /**
      * @param resPath
@@ -156,18 +151,25 @@ public class App extends Application {
                 return;
             }
 
-            BookFileReader reader = BookFileReader.createInstance(selectedFile.getAbsolutePath());
-            BookTextParser bp = new SimpleSequentialBookTextParser();
-            try {
-                List<String> sentences = bp.parseTextIntoSentences(reader.readIntoString());
-                words = new ArrayList<>(bp.countWords(sentences).values());
-            } catch (IOException e) {
-                e.printStackTrace();
-                // TODO: log and show error window
-            }
+            Callable<List<? extends Word>> parseBook = () -> {
+                BookFileReader reader = BookFileReader.createInstance(selectedFile.getAbsolutePath());
+                BookTextParser parser = new SimpleSequentialBookTextParser();
 
-            // Show results
-            showWords(1);
+                List<String> sentences = parser.parseTextIntoSentences(reader.readIntoString());
+                var result = new ArrayList<>(parser.countWords(sentences).values());
+                result.sort(Comparator.comparingLong(Word::getCount).reversed());
+                words = result;
+
+                return words;
+            };
+
+            Mono.fromCallable(parseBook)
+                    .subscribeOn(Schedulers.single())
+                    .subscribe(
+                            words -> Platform.runLater(() -> showWords(1)),
+                            Throwable::printStackTrace); // TODO: substitute with logging, add error window
+
+            webEngine.executeScript("loginLoading();");
         }
     }
 
@@ -178,12 +180,10 @@ public class App extends Application {
      *
      * @param page
      */
-    private void showWords(int page) {
+    public void showWords(int page) {
         if (page < 1 || page > (int) Math.ceil((double) words.size() / ITEMS_ON_PAGE)) {
             return;
         }
-
-        Document doc = webEngine.getDocument();
 
         JsonBuilderFactory arrayFactory = Json.createBuilderFactory(null);
         JsonArrayBuilder jsonArrayBuilder = arrayFactory.createArrayBuilder();
@@ -211,24 +211,15 @@ public class App extends Application {
     protected class ButtonLoginListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {
-            String email = (String) webEngine.executeScript(
-                    "document.getElementById('a_email').value");
-            String password = (String) webEngine.executeScript(
-                    "document.getElementById('a_password').value");
+            final var email = (String) webEngine.executeScript("document.getElementById('a_email').value");
+            final var password = (String) webEngine.executeScript("document.getElementById('a_password').value");
 
-            Task<JsonObject> task = new Task<>() {
-                @Override
-                protected JsonObject call() throws Exception {
-                    JsonObject profileInfo = leo.login(email, password);
-                    return profileInfo;
-                }
-            };
-            task.setOnSucceeded(stateEvent -> {
-                JsonObject profileInfo = task.getValue();
-                webEngine.executeScript("showProfileInfo(" + profileInfo.toString() + ")");
-            });
+            Mono.fromCallable(() -> leo.login(email, password))
+                    .subscribeOn(Schedulers.single())
+                    .subscribe(profileInfo -> Platform.runLater(
+                            () -> webEngine.executeScript("showProfileInfo(" + profileInfo.toString() + ")")));
 
-            new Thread(task).start();
+            webEngine.executeScript("loginLoading();");
         }
     }
 
@@ -238,30 +229,34 @@ public class App extends Application {
     protected class ButtonAddWordsListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {
-            Document doc = webEngine.getDocument();
-            String res = (String) webEngine.executeScript("selectedWords();");
+            final var res = (String) webEngine.executeScript("selectedWords();");
+            JsonArray wordsToAdd = Json.createReader(new StringReader(res)).readArray();
 
-            JsonReader jreader = Json.createReader(
-                    new StringReader(res));
-            JsonArray jarr = jreader.readArray();
-            System.out.println(jarr);
+            Callable<Void> addWordsToDictionary = () -> {
+                for (int i = 0; i < wordsToAdd.size(); i++) {
+                    JsonObject jobj = wordsToAdd.getJsonObject(i);
+                    String word = jobj.getString("word");
+                    String translate = leo.getTranslate(word);
+                    leo.addWord(word, translate, jobj.getString("context"));
 
-            for (int i = 0; i < jarr.size(); i++) {
-                JsonObject jobj = jarr.getJsonObject(i);
-                String word = jobj.getString("word");
-                String translate = leo.getTranslate(word);
-                System.out.println("word: " + word + "; translate: " + translate);
-                leo.addWord(word, translate, jobj.getString("context"));
+                    int wordId = Integer.parseInt(jobj.getString("id"));
+                    words.remove(wordId - i);
+                }
+                return null;
+            };
 
-                int wordId = Integer.valueOf(jobj.getString("id"));
-                System.out.println("Deleting from the list: " + wordId);
-                words.remove(wordId - i);
-            }
-
-            // Refresh the list of words
-            String page = (String) webEngine.executeScript(
-                    "document.getElementById('words_paginator_pages_page').value");
-            showWords(Integer.valueOf(page));
+            Mono.fromCallable(addWordsToDictionary)
+                    .subscribeOn(Schedulers.single())
+                    .subscribe(
+                            r -> {
+                                // Refresh the list of words
+                                Platform.runLater(() -> {
+                                    var page = (String) webEngine.executeScript(
+                                            "document.getElementById('words_paginator_pages_page').value");
+                                    showWords(Integer.parseInt(page));
+                                });
+                            },
+                            Throwable::printStackTrace);
         }
 
     }
@@ -274,7 +269,7 @@ public class App extends Application {
         public void handleEvent(Event evt) {
             String page = (String) webEngine.executeScript(
                     "document.getElementById('words_paginator_pages_page').value");
-            showWords(Integer.valueOf(page));
+            showWords(Integer.parseInt(page));
         }
     }
 
@@ -286,7 +281,7 @@ public class App extends Application {
         public void handleEvent(Event evt) {
             String page = (String) webEngine.executeScript(
                     "document.getElementById('words_paginator_pages_page').value");
-            showWords(Integer.valueOf(page) - 1);
+            showWords(Integer.parseInt(page) - 1);
         }
     }
 
@@ -298,7 +293,7 @@ public class App extends Application {
         public void handleEvent(Event evt) {
             String page = (String) webEngine.executeScript(
                     "document.getElementById('words_paginator_pages_page').value");
-            showWords(Integer.valueOf(page) + 1);
+            showWords(Integer.parseInt(page) + 1);
         }
     }
 
