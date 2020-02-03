@@ -1,7 +1,6 @@
 package jila.parser;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,6 +26,11 @@ public class ParallelStreamsWithOnlyFlatmapBookTextParser extends BookTextParser
         return wordsMap;
     }
 
+    /**
+     * Parses a sentence into a list of words.
+     * @param sentence  a sentence
+     * @return  list of words
+     */
     public List<Word> parseSentence(final String sentence) {
         Pattern splitter = Pattern.compile(PATTERN);
         Matcher matcher = splitter.matcher(sentence);
