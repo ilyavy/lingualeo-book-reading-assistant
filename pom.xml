@@ -5,6 +5,7 @@
     <groupId>jila.lingualeo</groupId>
     <artifactId>lingualeo-book-reading-assistant</artifactId>
     <version>1.0.0</version>
+         
     <name>English Book Reading Assistant</name>
 
     <properties>
