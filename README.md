@@ -1,4 +1,11 @@
 # English Book Reading Assistant
+
+[![ilyavy](https://circleci.com/gh/ilyavy/lingualeo-book-reading-assistant.svg?style=svg)](https://circleci.com/gh/ilyavy/lingualeo-book-reading-assistant)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ilyavy_lingualeo-book-reading-assistant&metric=coverage)](https://sonarcloud.io/dashboard?id=ilyavy_lingualeo-book-reading-assistant)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ilyavy_lingualeo-book-reading-assistant&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=ilyavy_lingualeo-book-reading-assistant)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=ilyavy_lingualeo-book-reading-assistant&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=ilyavy_lingualeo-book-reading-assistant)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ilyavy_lingualeo-book-reading-assistant&metric=security_rating)](https://sonarcloud.io/dashboard?id=ilyavy_lingualeo-book-reading-assistant)
+
 The GUI desktop application, allows to analyze English books and add the most frequently used in the text words into https://lingualeo.com dictionary for further learning.
 
 It is supposed that it will help to learn the most frequently used words before reading the book, to make reading experience more smooth and enjoyable.
