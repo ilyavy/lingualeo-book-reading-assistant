@@ -8,6 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jila.model.Word;
+
 /**
  * Book parser, which divides the sentences into chunks, the number of which is equal to available CPU cores,
  * and then processes them in parallel using CompletableFutures and a blocking queue storing the results of
@@ -40,7 +42,7 @@ public class FuturesBookTextParser extends BookTextParser {
             result = CompletableFuture.supplyAsync(() ->
                     mergeMapsFromQueue(futuresResultsQueue, parsedSentencesChunksCounter)).get();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return result;
@@ -73,8 +75,7 @@ public class FuturesBookTextParser extends BookTextParser {
             return mergeMapsFromQueue(futuresResultsQueue, parsedSentencesChunksCounter);
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

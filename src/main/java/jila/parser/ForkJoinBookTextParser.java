@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RecursiveTask;
 
+import jila.model.Word;
+
 /**
  * Book parser, which recursively forks the sentences into chunks, the number of which is equal to available CPU cores,
  * and processes all the chunks in parallel, joining the results.

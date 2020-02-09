@@ -7,6 +7,9 @@ import java.util.concurrent.Phaser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jila.model.Word;
+import jila.model.WordWithAtomicCounter;
+
 /**
  * Book parser, which is similar to {@link ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser},
  * but uses simple threads instead of ForkJoin Framework to parallelize the job, and a phaser to sync the result.

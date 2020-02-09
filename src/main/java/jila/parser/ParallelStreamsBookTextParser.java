@@ -9,6 +9,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import jila.model.SimpleWord;
+import jila.model.Word;
+
 /**
  * Book parser, which uses parallel streams to parallelize the job..
  */

@@ -23,12 +23,13 @@ class TxtFileReader extends BookFileReader {
 
         StringBuilder sb = new StringBuilder();
 
-        BufferedReader br = new BufferedReader(new FileReader(filePath));
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line).append(" ");
-        }
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append(" ");
+            }
 
-        return sb.toString();
+            return sb.toString();
+        }
     }
 }

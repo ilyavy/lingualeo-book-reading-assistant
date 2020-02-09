@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import jila.model.Word;
+
 /**
  * Naive implementation of BookTextParser, using serial stream of sentences.
  */

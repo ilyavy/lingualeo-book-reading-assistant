@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jila.model.Word;
+
 /**
  * Book parser, which analyzes the sentences of a book sequentially, sentence by sentence.
  */
