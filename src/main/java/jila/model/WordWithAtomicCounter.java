@@ -1,4 +1,4 @@
-package jila.parser;
+package jila.model;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -10,13 +10,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * implementations. It can be array, list, map or anything else.
  */
 public class WordWithAtomicCounter extends Word {
-
-    /**
-     * The context is stored as an array of Word objects.
-     * The order of the words in the array is the same as
-     * the order in the original sentence.
-     */
-    private String context = null;
 
     /**
      * How much word has been found in the text.
@@ -34,28 +27,6 @@ public class WordWithAtomicCounter extends Word {
 
     public WordWithAtomicCounter(final String word, final String context) {
         super(word, context);
-    }
-
-    /**
-     * Returns the context (the sentence, where the word
-     * has been used) as a string object.
-     *
-     * @return
-     */
-    public String getContext() {
-        return context;
-    }
-
-    /**
-     * Sets a context to the word.
-     *
-     * @param context the array of Word objects, forming the
-     *                sentence, where the word has been used.
-     */
-    @Override
-    public WordWithAtomicCounter setContext(final String context) {
-        this.context = context;
-        return this;
     }
 
     /**

@@ -7,6 +7,9 @@ import java.util.concurrent.RecursiveTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jila.model.Word;
+import jila.model.WordWithAtomicCounter;
+
 /**
  * Book parser, which is similar to {@link ForkJoinBookTextParser}, the differences are: word implementation
  * uses atomic counter and all the words are stored in the concurrent hash map.

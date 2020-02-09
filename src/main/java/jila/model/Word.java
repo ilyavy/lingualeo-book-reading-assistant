@@ -1,13 +1,7 @@
-package jila.parser;
+package jila.model;
 
 import java.util.Comparator;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.json.Json;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import java.util.Objects;
 
 /**
  * Represents word entity.
@@ -16,7 +10,9 @@ import javax.json.JsonObjectBuilder;
  * How to store and work with context should be decided in the concrete
  * implementations. It can be array, list, map or anything else.
  */
-public abstract class Word implements Comparable<Word>, Jsonable {
+public abstract class Word implements Comparable<Word> {
+    private int id;
+
     /**
      * String value of word entity.
      */
@@ -26,6 +22,8 @@ public abstract class Word implements Comparable<Word>, Jsonable {
      * The translation of the word.
      */
     private String translate = "";
+
+    private String context = "";
 
     /**
      * The flag, which shows either the word is known by the user or not.
@@ -40,7 +38,8 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Creates the word entity by its string value.
-     * @param word  string representation of the word
+     *
+     * @param word string representation of the word
      */
     public Word(final String word) {
         setWord(word);
@@ -51,10 +50,19 @@ public abstract class Word implements Comparable<Word>, Jsonable {
         setContext(context);
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public Word setId(int id) {
+        this.id = id;
+        return this;
+    }
 
     /**
      * Returns the string value of the word.
-     * @return  string representation of the word
+     *
+     * @return string representation of the word
      */
     public String getWord() {
         return word;
@@ -62,7 +70,8 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Returns the translation of the word.
-     * @return  the translation of the word
+     *
+     * @return the translation of the word
      */
     public String getTranslate() {
         return translate;
@@ -71,19 +80,27 @@ public abstract class Word implements Comparable<Word>, Jsonable {
     /**
      * Returns the context (the sentence, where the word
      * has been used) as a string object.
+     *
      * @return
      */
-    public abstract String getContext();
+    public String getContext() {
+        return context;
+    }
 
     /**
      * Sets a context to the word.
-     * @param context   the array of Word objects, forming the
-     *                  sentence, where the word has been used.
+     *
+     * @param context the array of Word objects, forming the
+     *                sentence, where the word has been used.
      */
-    public abstract Word setContext(String context);
+    public Word setContext(final String context) {
+        this.context = context;
+        return this;
+    }
 
     /**
      * Returns the value of the known flag.
+     *
      * @return boolean, either the word is already known by a user or not
      */
     public boolean isKnown() {
@@ -92,6 +109,7 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Returns the value of the count.
+     *
      * @return how much times the word has been found in the text
      */
     public abstract long getCount();
@@ -100,7 +118,8 @@ public abstract class Word implements Comparable<Word>, Jsonable {
      * Sets the new value for string representation of the word.
      * Should not be given public access. Supposed to be used only
      * inside the class.
-     * @param word  a string representation of the word
+     *
+     * @param word a string representation of the word
      */
     protected Word setWord(final String word) {
         this.word = word.toLowerCase();
@@ -109,6 +128,7 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Sets the new translation of the word.
+     *
      * @param translate the tranlsation of the word
      */
     public Word setTranslate(final String translate) {
@@ -118,6 +138,7 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Sets the new value for the known flag.
+     *
      * @param known boolean value of the known flag
      */
     public Word setKnown(final boolean known) {
@@ -127,7 +148,8 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Sets new value for the count field.
-     * @param newCount  a new value for the cound field
+     *
+     * @param newCount a new value for the cound field
      */
     public abstract Word setCount(long newCount);
 
@@ -135,7 +157,8 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Transforms the word into a string.
-     * @return  the string form of the word entity
+     *
+     * @return the string form of the word entity
      */
     @Override
     public String toString() {
@@ -144,8 +167,9 @@ public abstract class Word implements Comparable<Word>, Jsonable {
 
     /**
      * Compares the string representations of this word with another one.
-     * @param that  the word to be compared with
-     * @return  -1 - this < that, 0 - equal, +1 - this > that
+     *
+     * @param that the word to be compared with
+     * @return -1 - this < that, 0 - equal, +1 - this > that
      */
     @Override
     public int compareTo(final Word that) {
@@ -155,8 +179,9 @@ public abstract class Word implements Comparable<Word>, Jsonable {
     /**
      * Returns true if this and that word are equal in the
      * meaning of their string representations and the count values.
+     *
      * @param obj the word to be compared with
-     * @return  boolean, equal or not
+     * @return boolean, equal or not
      */
     @Override
     public boolean equals(final Object obj) {
@@ -170,44 +195,14 @@ public abstract class Word implements Comparable<Word>, Jsonable {
         return false;
     }
 
-    /**
-     * Creates {@link JsonObject} without special attributes.
-     * @return  JSON representation of the word with its fields
-     */
     @Override
-    public JsonObject toJsonObject() {
-        return toJsonObject(null);
+    public int hashCode() {
+        return Objects.hash(word, getCount());
     }
-
-    /**
-     * Creates {@link JsonObject} with special attributes.
-     * @param attributes    the map of the attributes to be used with the
-     *                      resulting JsonObject
-     * @return  JSON representation of the word with its fields
-     */
-    @Override
-    public JsonObject toJsonObject(final Map<String, String> attributes) {
-        JsonBuilderFactory factory = Json.createBuilderFactory(null);
-        JsonObjectBuilder builder = factory.createObjectBuilder();
-
-        builder.add("word", getWord());
-        builder.add("translate", getTranslate());
-        builder.add("context", getContext());
-        builder.add("known", isKnown());
-        builder.add("count", getCount());
-
-        if (attributes != null) {
-            for (Entry<String, String> entry : attributes.entrySet()) {
-                builder.add(entry.getKey(), entry.getValue());
-            }
-        }
-
-        return builder.build();
-    }
-
 
     /**
      * Creates new CountComparator.
+     *
      * @return new CountComparator
      */
     public static Comparator<Word> countOrder() {
@@ -224,14 +219,15 @@ public abstract class Word implements Comparable<Word>, Jsonable {
         /**
          * Compares the word entities by their field count, i.e. the word
          * is bigger if it has been found more often in the source text.
+         *
          * @param o1
          * @param o2
          * @return -1 - o1 < o2, 0 - equal, +1 - o2 > o1
          */
         @Override
         public int compare(final Word o1, final Word o2) {
-            Long c1 = Long.valueOf(o1.getCount());
-            Long c2 = Long.valueOf(o2.getCount());
+            Long c1 = o1.getCount();
+            Long c2 = o2.getCount();
             return c1.compareTo(c2);
         }
     }

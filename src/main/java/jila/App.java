@@ -4,21 +4,14 @@ import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Worker.State;
@@ -29,15 +22,17 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import jila.model.SimpleWord;
+import jila.model.Word;
 import jila.parser.BookTextParser;
 import jila.parser.SimpleSequentialBookTextParser;
-import jila.parser.Word;
 import jila.reader.BookFileReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -54,7 +49,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        leo = new LingualeoApi(LingualeoApi.createConnector());
+        leo = new LingualeoApi();
         browser = new WebView();
         webEngine = browser.getEngine();
         webEngine.setJavaScriptEnabled(true);
@@ -193,23 +188,23 @@ public class App extends Application {
             return;
         }
 
-        JsonBuilderFactory arrayFactory = Json.createBuilderFactory(null);
-        JsonArrayBuilder jsonArrayBuilder = arrayFactory.createArrayBuilder();
-
-        Word word = null;
+        List<Word> wordsToShow = new ArrayList<>();
         for (int i = (page - 1) * ITEMS_ON_PAGE;
              i < Math.min(page * ITEMS_ON_PAGE, words.size()); i++) {
-            word = words.get(i);
-            Map<String, String> attr = new HashMap<>(2);
-            attr.put("id", String.valueOf(i));
-            jsonArrayBuilder.add(word.toJsonObject(attr));
+            Word word = words.get(i);
+            word.setId(i);
+            wordsToShow.add(word);
         }
-        JsonArray jsonArray = jsonArrayBuilder.build();
 
-        String template = readTemplate("view/html/word.html");
-        webEngine.executeScript("printEntitiesList('" + template + "', " +
-                jsonArray.toString() + ", " + page + ", "
-                + (words.size() / ITEMS_ON_PAGE) + ")");
+        try {
+            String wordsToShowStr = new ObjectMapper().writeValueAsString(wordsToShow);
+            String template = readTemplate("view/html/word.html");
+            webEngine.executeScript("printEntitiesList('" + template + "', " + wordsToShowStr + ", " + page + ", "
+                    + (words.size() / ITEMS_ON_PAGE) + ")");
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -222,12 +217,15 @@ public class App extends Application {
             final var email = (String) webEngine.executeScript("document.getElementById('a_email').value");
             final var password = (String) webEngine.executeScript("document.getElementById('a_password').value");
 
-            Mono.fromCallable(() -> leo.login(email, password))
+            leo.login(email, password)
                     .subscribeOn(Schedulers.single())
-                    .subscribe(profileInfo -> Platform.runLater(
-                            () -> webEngine.executeScript("showProfileInfo(" + profileInfo.toString() + ")")));
+                    .subscribe(this::showProfileInfo, Throwable::printStackTrace);
 
             webEngine.executeScript("loginLoading();");
+        }
+
+        private void showProfileInfo(String profileInfo) {
+            Platform.runLater(() -> webEngine.executeScript("showProfileInfo(" + profileInfo + ")"));
         }
     }
 
@@ -237,36 +235,29 @@ public class App extends Application {
     protected class ButtonAddWordsListener implements EventListener {
         @Override
         public void handleEvent(Event evt) {
-            final var res = (String) webEngine.executeScript("selectedWords();");
-            JsonArray wordsToAdd = Json.createReader(new StringReader(res)).readArray();
+            var wordsToAddStr = (String) webEngine.executeScript("selectedWords();");
+            int page = Integer.parseInt((String) webEngine.executeScript(
+                    "document.getElementById('words_paginator_pages_page').value"));
 
-            Callable<Void> addWordsToDictionary = () -> {
-                for (int i = 0; i < wordsToAdd.size(); i++) {
-                    JsonObject jobj = wordsToAdd.getJsonObject(i);
-                    String word = jobj.getString("word");
-                    String translate = leo.getTranslate(word);
-                    leo.addWord(word, translate, jobj.getString("context"));
-
-                    int wordId = Integer.parseInt(jobj.getString("id"));
-                    words.remove(wordId - i);
-                }
-                return null;
-            };
-
-            Mono.fromCallable(addWordsToDictionary)
+            Mono.fromCallable(() -> new ObjectMapper().readValue(wordsToAddStr, SimpleWord[].class))
+                    .flatMapMany(Flux::fromArray)
+                    .concatMap(leo::requestAndSetTranslation)
+                    .concatMap(leo::addWordToDictionary)
+                    .index()
                     .subscribeOn(Schedulers.single())
-                    .subscribe(
-                            r -> {
-                                // Refresh the list of words
-                                Platform.runLater(() -> {
-                                    var page = (String) webEngine.executeScript(
-                                            "document.getElementById('words_paginator_pages_page').value");
-                                    showWords(Integer.parseInt(page));
-                                });
+                    .subscribe(tuple -> {
+                                int indexToRemove = (int) (tuple.getT2().getId() - tuple.getT1());
+                                words.remove(indexToRemove);
+                                System.out.println(tuple.getT2().getWord() + " - word is added");
                             },
-                            Throwable::printStackTrace);
-        }
+                            Throwable::printStackTrace,
+                            () -> Platform.runLater(() -> showWords(page)));
 
+            webEngine.executeScript("showWelcomeScreen();" +
+                    "document.getElementById('profile_info').style.display = 'none'; " +
+                    "document.getElementById('auth').style.display = 'block'; " +
+                    "loginLoading();");
+        }
     }
 
     /**
