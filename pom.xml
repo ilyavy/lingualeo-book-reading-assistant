@@ -24,6 +24,8 @@
         <checkstyle-plugin.version>3.1.0</checkstyle-plugin.version>
         <checkstyle.url>https://raw.githubusercontent.com/ilyavy/checkstyle/master/checkstyle.xml</checkstyle.url>
         <jacoco-plugin.version>0.8.5</jacoco-plugin.version>
+
+        <sonar.exclusions>**/model/api/*.java,**Launcher.java,**/parser/*.java</sonar.exclusions>
     </properties>
 
     <distributionManagement>
@@ -81,7 +83,6 @@
             <version>0.9.4.RELEASE</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
@@ -106,14 +107,27 @@
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>3.15.0</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -216,6 +230,11 @@
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M4</version>
             </plugin>
 
             <plugin>
