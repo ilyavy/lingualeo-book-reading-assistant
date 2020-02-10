@@ -5,33 +5,40 @@ import java.io.IOException;
 
 /**
  * Abstract file reader with static factory to create a concrete instance.
+ * Supported formats: plain text (.txt).
  */
 public abstract class BookFileReader {
 
-    String filePath;
+    File bookFile;
 
-    public BookFileReader(String filePath) {
-        this.filePath = filePath;
+    BookFileReader(File bookFile) {
+        this.bookFile = bookFile;
     }
 
+    /**
+     * Reads the book's file into string.
+     *
+     * @return text of the book in string
+     * @throws IOException in case of problems with reading the file
+     */
     public abstract String readIntoString() throws IOException;
 
     /**
      * Creates a concrete book file reader by the specified file path. A concrete implementation is chosen based
      * on the file's extension.
      *
-     * @param filePath path to the file to read
-     * @return
+     * @param bookFile file referencing a book
+     * @return BookFileReader instance
+     * @throws IllegalArgumentException      if the file is specified does not exist
+     * @throws UnsupportedOperationException if an extension of the file is not supported
      */
-    public static BookFileReader createInstance(final String filePath) {
-        File file = new File(filePath);
-
-        if (!file.exists()) {
+    public static BookFileReader createInstance(final File bookFile) {
+        if (!bookFile.exists()) {
             throw new IllegalArgumentException("The book's file is not found");
         }
 
-        if (file.getName().endsWith(".txt")) {
-            return new TxtFileReader(filePath);
+        if (bookFile.getName().endsWith(".txt")) {
+            return new TxtFileReader(bookFile);
         } else {
             throw new UnsupportedOperationException("This file extension is not supported yet");
         }

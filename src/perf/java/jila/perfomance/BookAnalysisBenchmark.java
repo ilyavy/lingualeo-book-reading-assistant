@@ -1,5 +1,6 @@
 package jila.perfomance;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +19,7 @@ public class BookAnalysisBenchmark {
 
     @Setup
     public void setup() throws IOException {
-        String text = BookFileReader.createInstance("../book-samples/war-peace.txt").readIntoString();
+        String text = BookFileReader.createInstance(new File("../book-samples/war-peace.txt")).readIntoString();
 
         BookTextParser bp = new SimpleSequentialBookTextParser();
         sentences = bp.parseTextIntoSentences(text);
