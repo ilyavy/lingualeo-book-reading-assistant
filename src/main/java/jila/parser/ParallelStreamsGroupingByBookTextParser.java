@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import jila.model.SimpleWord;
 import jila.model.Word;
+import jila.parser.word.SimpleWord;
 
 /**
  * Book parser, which uses parallel streams to parallelize the job..
@@ -37,8 +37,9 @@ public class ParallelStreamsGroupingByBookTextParser extends BookTextParser {
 
     /**
      * Parses a sentence into a list of words.
-     * @param sentence  a sentence
-     * @return  list of words
+     *
+     * @param sentence a sentence
+     * @return list of words
      */
     public List<Word> parseSentence(final String sentence) {
         Pattern splitter = Pattern.compile(PATTERN);
