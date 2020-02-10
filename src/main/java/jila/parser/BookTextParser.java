@@ -1,5 +1,6 @@
 package jila.parser;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +143,7 @@ public abstract class BookTextParser {
      */
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         BookTextParser bookParser = new ParallelStreamsBookTextParser();
-        String text = BookFileReader.createInstance("./book-samples/war-peace.txt").readIntoString();
+        String text = BookFileReader.createInstance(new File("./book-samples/war-peace.txt")).readIntoString();
 
         List<String> sentences = bookParser.parseTextIntoSentences(text);
         Map<String, Word> wordsMap = bookParser.countWords(sentences);

@@ -155,7 +155,7 @@ public class App extends Application {
             }
 
             Callable<List<? extends Word>> parseBook = () -> {
-                BookFileReader reader = BookFileReader.createInstance(selectedFile.getAbsolutePath());
+                BookFileReader reader = BookFileReader.createInstance(new File(selectedFile.getAbsolutePath()));
                 BookTextParser parser = new SimpleSequentialBookTextParser();
 
                 List<String> sentences = parser.parseTextIntoSentences(reader.readIntoString());

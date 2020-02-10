@@ -1,0 +1,2 @@
+This is simple plain text book. It is
+in .txt format.
