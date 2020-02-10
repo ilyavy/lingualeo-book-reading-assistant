@@ -5,12 +5,12 @@ import java.util.Objects;
 
 /**
  * Represents word entity.
- * It is an abstract class. It does not implement functionality
- * related to contexts (the sentence, where the word has been used).
- * How to store and work with context should be decided in the concrete
- * implementations. It can be array, list, map or anything else.
+ * It is an abstract class - logic for counting should be implemented by ancestors.
  */
 public abstract class Word implements Comparable<Word> {
+    /**
+     * Id of the word.
+     */
     private int id;
 
     /**
@@ -23,6 +23,9 @@ public abstract class Word implements Comparable<Word> {
      */
     private String translate = "";
 
+    /**
+     * A sentence, in which the word is used.
+     */
     private String context = "";
 
     /**
@@ -31,9 +34,10 @@ public abstract class Word implements Comparable<Word> {
     private boolean known = false;
 
     /**
-     * The default constructor.
+     * The default constructor is not supported.
      */
-    public Word() {
+    private Word() {
+        throw new UnsupportedOperationException("A word cannot be created without its string value.");
     }
 
     /**
@@ -45,6 +49,12 @@ public abstract class Word implements Comparable<Word> {
         setWord(word);
     }
 
+    /**
+     * Creates the word entity by its string value and a context.
+     *
+     * @param word    string representation of the word
+     * @param context sentence, in which the word is used
+     */
     public Word(final String word, final String context) {
         this(word);
         setContext(context);
@@ -59,50 +69,23 @@ public abstract class Word implements Comparable<Word> {
         return this;
     }
 
-    /**
-     * Returns the string value of the word.
-     *
-     * @return string representation of the word
-     */
     public String getWord() {
         return word;
     }
 
-    /**
-     * Returns the translation of the word.
-     *
-     * @return the translation of the word
-     */
     public String getTranslate() {
         return translate;
     }
 
-    /**
-     * Returns the context (the sentence, where the word
-     * has been used) as a string object.
-     *
-     * @return
-     */
     public String getContext() {
         return context;
     }
 
-    /**
-     * Sets a context to the word.
-     *
-     * @param context the array of Word objects, forming the
-     *                sentence, where the word has been used.
-     */
     public Word setContext(final String context) {
         this.context = context;
         return this;
     }
 
-    /**
-     * Returns the value of the known flag.
-     *
-     * @return boolean, either the word is already known by a user or not
-     */
     public boolean isKnown() {
         return known;
     }
@@ -116,8 +99,7 @@ public abstract class Word implements Comparable<Word> {
 
     /**
      * Sets the new value for string representation of the word.
-     * Should not be given public access. Supposed to be used only
-     * inside the class.
+     * Should not be given public access. Supposed to be used only inside the class.
      *
      * @param word a string representation of the word
      */
@@ -126,21 +108,11 @@ public abstract class Word implements Comparable<Word> {
         return this;
     }
 
-    /**
-     * Sets the new translation of the word.
-     *
-     * @param translate the tranlsation of the word
-     */
     public Word setTranslate(final String translate) {
         this.translate = translate;
         return this;
     }
 
-    /**
-     * Sets the new value for the known flag.
-     *
-     * @param known boolean value of the known flag
-     */
     public Word setKnown(final boolean known) {
         this.known = known;
         return this;
@@ -153,13 +125,13 @@ public abstract class Word implements Comparable<Word> {
      */
     public abstract Word setCount(long newCount);
 
+    /**
+     * Increments the value of the inner counter.
+     *
+     * @return resulting value of the counter
+     */
     public abstract long incrementCount();
 
-    /**
-     * Transforms the word into a string.
-     *
-     * @return the string form of the word entity
-     */
     @Override
     public String toString() {
         return word + " :: " + getCount();
@@ -169,35 +141,27 @@ public abstract class Word implements Comparable<Word> {
      * Compares the string representations of this word with another one.
      *
      * @param that the word to be compared with
-     * @return -1 - this < that, 0 - equal, +1 - this > that
+     * @return the value {@code 0} if the argument word's string representation is equal to this word's string
+     *         representation; a value less than {@code 0} if this word's string representation is lexicographically
+     *         less than the word's string representation argument; and a value greater than {@code 0} otherwise.
      */
     @Override
     public int compareTo(final Word that) {
         return word.compareTo(that.word);
     }
 
-    /**
-     * Returns true if this and that word are equal in the
-     * meaning of their string representations and the count values.
-     *
-     * @param obj the word to be compared with
-     * @return boolean, equal or not
-     */
     @Override
     public boolean equals(final Object obj) {
         if (!(obj instanceof Word)) {
             return false;
         }
         Word that = (Word) obj;
-        if (word.equals(that.word) && getCount() == that.getCount()) {
-            return true;
-        }
-        return false;
+        return word.equals(that.word);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(word, getCount());
+        return Objects.hash(word);
     }
 
     /**
@@ -211,17 +175,15 @@ public abstract class Word implements Comparable<Word> {
 
 
     /**
-     * Comparator for words, which uses count value of the words
-     * in order to compare them.
+     * Comparator for words, which uses count value of the words in order to compare them.
      */
-    protected static class CountComparator
-            implements Comparator<Word> {
+    protected static class CountComparator implements Comparator<Word> {
         /**
-         * Compares the word entities by their field count, i.e. the word
-         * is bigger if it has been found more often in the source text.
+         * Compares the word entities by their field count, i.e. the word is bigger
+         * if it has been found more often in the source text.
          *
-         * @param o1
-         * @param o2
+         * @param o1 first word
+         * @param o2 second word
          * @return -1 - o1 < o2, 0 - equal, +1 - o2 > o1
          */
         @Override

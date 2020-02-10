@@ -9,8 +9,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jila.model.SimpleWord;
 import jila.model.Word;
+import jila.parser.word.SimpleWord;
 import jila.reader.BookFileReader;
 
 /**

@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jila.model.Word;
-import jila.model.WordWithAtomicCounter;
+import jila.parser.word.WordWithAtomicCounter;
 
 /**
  * Book parser, which is similar to {@link ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser},

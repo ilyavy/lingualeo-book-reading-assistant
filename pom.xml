@@ -19,6 +19,7 @@
         <javafx.version>13.0.2</javafx.version>
 
         <!-- Plugins -->
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.1.0</checkstyle-plugin.version>
@@ -147,6 +148,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>13</source>
                     <target>13</target>
