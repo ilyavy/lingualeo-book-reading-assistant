@@ -194,7 +194,7 @@
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
-                                    <mainClass>jila.Launcher</mainClass>
+                                    <mainClass>com.github.ilyavy.Launcher</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
