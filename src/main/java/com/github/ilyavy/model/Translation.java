@@ -1,4 +1,4 @@
-package com.github.ilyavy.model.api;
+package com.github.ilyavy.model;
 
 import java.util.Objects;
 

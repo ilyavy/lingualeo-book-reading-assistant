@@ -28,14 +28,12 @@ jobs:
       # Static analysis
       - run: mvn checkstyle:checkstyle
 
-      # Unit tests
-      - run: mvn test
+      # Unit & Integration Tests
+      - run: mvn verify
+
       # - run: bash <(curl -s https://codecov.io/bash)
 
       - run: mvn sonar:sonar
-
-      # Package
-      - run: mvn package -DskipTests
 
 workflows:
   main:

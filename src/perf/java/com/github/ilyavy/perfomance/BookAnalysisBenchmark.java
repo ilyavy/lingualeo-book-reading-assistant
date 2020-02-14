@@ -17,9 +17,15 @@ import com.github.ilyavy.parser.ParallelStreamsToMapBookTextParser;
 import com.github.ilyavy.parser.ParallelStreamsWithOnlyFlatmapBookTextParser;
 import com.github.ilyavy.parser.SimpleSequentialBookTextParser;
 import com.github.ilyavy.parser.SingleStreamNaiveBookTextParser;
-import jila.parser.*;
 import com.github.ilyavy.reader.BookFileReader;
-import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.BenchmarkMode;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Mode;
+import org.openjdk.jmh.annotations.OutputTimeUnit;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
 
 @BenchmarkMode({Mode.SampleTime, Mode.AverageTime})
 @OutputTimeUnit(TimeUnit.MILLISECONDS)

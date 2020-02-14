@@ -5,13 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.ilyavy.reader.BookFileReader;
 import com.github.ilyavy.model.Word;
 import com.github.ilyavy.parser.word.SimpleWord;
+import com.github.ilyavy.reader.BookFileReader;
 
 /**
  * Utility class. Allows to parse a text of a specified book.
@@ -139,9 +138,11 @@ public abstract class BookTextParser {
 
     /**
      * Debug method.
-     * TODO: remove
+     *
+     * @throws IOException by book parser
+     *                     TODO: remove
      */
-    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         BookTextParser bookParser = new ParallelStreamsBookTextParser();
         String text = BookFileReader.createInstance(new File("./book-samples/war-peace.txt")).readIntoString();
 

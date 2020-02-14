@@ -1,6 +1,8 @@
-package com.github.ilyavy;
+package com.github.ilyavy.controller;
 
+import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
+import com.github.ilyavy.model.api.LoginResponse;
 import com.github.ilyavy.model.api.TranslateResponse;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -37,7 +39,7 @@ public class LingualeoApi {
      * @param password - user's password. Should not be encrypted.
      * @return JsonObject, containing user's profile data.
      */
-    public Mono<String> login(final String email, final String password) {
+    public Mono<LingualeoProfile> login(final String email, final String password) {
         return WebClient.create(BASE_URL)
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -48,7 +50,8 @@ public class LingualeoApi {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .doOnSuccess(response -> cookie = response.cookies().getFirst("remember").getValue())
-                .flatMap(response -> response.bodyToMono(String.class));
+                .flatMap(response -> response.bodyToMono(LoginResponse.class))
+                .map(LoginResponse::getUser);
     }
 
     /**
