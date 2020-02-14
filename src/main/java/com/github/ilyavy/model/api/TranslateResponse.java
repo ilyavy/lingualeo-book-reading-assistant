@@ -2,6 +2,8 @@ package com.github.ilyavy.model.api;
 
 import java.util.Arrays;
 
+import com.github.ilyavy.model.Translation;
+
 /**
  * Response of LL api call to get a translation of a word.
  */

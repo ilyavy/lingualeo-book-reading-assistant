@@ -1,11 +1,11 @@
-package com.github.ilyavy.model.api;
+package com.github.ilyavy.model;
 
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A representation of LL profile.
+ * A representation of Lingualeo profile.
  */
 public class LingualeoProfile {
 
@@ -30,48 +30,54 @@ public class LingualeoProfile {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public LingualeoProfile setUserId(int userId) {
         this.userId = userId;
+        return this;
     }
 
     public String getNickname() {
         return nickname;
     }
 
-    public void setNickname(String nickname) {
+    public LingualeoProfile setNickname(String nickname) {
         this.nickname = nickname;
+        return this;
     }
 
     public int getExpLevel() {
         return expLevel;
     }
 
-    public void setExpLevel(int expLevel) {
+    public LingualeoProfile setExpLevel(int expLevel) {
         this.expLevel = expLevel;
+        return this;
     }
 
     public int getHungryPct() {
         return hungryPct;
     }
 
-    public void setHungryPct(int hungryPct) {
+    public LingualeoProfile setHungryPct(int hungryPct) {
         this.hungryPct = hungryPct;
+        return this;
     }
 
     public int getWordsCount() {
         return wordsCount;
     }
 
-    public void setWordsCount(int wordsCount) {
+    public LingualeoProfile setWordsCount(int wordsCount) {
         this.wordsCount = wordsCount;
+        return this;
     }
 
     public int getWordsKnown() {
         return wordsKnown;
     }
 
-    public void setWordsKnown(int wordsKnown) {
+    public LingualeoProfile setWordsKnown(int wordsKnown) {
         this.wordsKnown = wordsKnown;
+        return this;
     }
 
     @Override

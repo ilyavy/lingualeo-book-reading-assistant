@@ -25,12 +25,12 @@ function loginLoading() {
 function showProfileInfo(profileInfo) {
     document.getElementById("auth").style.display = "none";
     document.getElementById("profile_info").style.display = "table";
-    document.getElementsByClassName("profile_nickname")[0].innerHTML = profileInfo.user.nickname;
-    document.getElementsByClassName("profile_lvl")[0].innerHTML = profileInfo.user.xp_level;
-    document.getElementById("profile_words_known").innerHTML = profileInfo.user.words_known;
-    document.getElementById("profile_words_cnt").innerHTML = profileInfo.user.words_cnt;
-    document.getElementById("profile_satiety_percent").innerHTML = profileInfo.user.hungry_pct;
-    document.getElementsByClassName("profile_satiety_progress")[0].style.width = profileInfo.user.hungry_pct;
+    document.getElementsByClassName("profile_nickname")[0].innerHTML = profileInfo.nickname;
+    document.getElementsByClassName("profile_lvl")[0].innerHTML = profileInfo.xp_level;
+    document.getElementById("profile_words_known").innerHTML = profileInfo.words_known;
+    document.getElementById("profile_words_cnt").innerHTML = profileInfo.words_cnt;
+    document.getElementById("profile_satiety_percent").innerHTML = profileInfo.hungry_pct;
+    document.getElementsByClassName("profile_satiety_progress")[0].style.width = profileInfo.hungry_pct;
 }
 
 /**
@@ -69,8 +69,7 @@ function allWords() {
  * Check / Uncheck one word
  */
 function selectWord(checkbox) {
-	swapClass(checkbox, "words_word_checkbox_checked",
-			"words_word_checkbox_unchecked");
+	swapClass(checkbox, "words_word_checkbox_checked", "words_word_checkbox_unchecked");
 }
 
 /**

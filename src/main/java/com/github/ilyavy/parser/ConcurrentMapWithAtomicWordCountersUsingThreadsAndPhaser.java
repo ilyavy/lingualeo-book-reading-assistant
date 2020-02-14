@@ -7,8 +7,8 @@ import java.util.concurrent.Phaser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.ilyavy.parser.word.WordWithAtomicCounter;
 import com.github.ilyavy.model.Word;
+import com.github.ilyavy.parser.word.WordWithAtomicCounter;
 
 /**
  * Book parser, which is similar to {@link ConcurrentMapWithAtomicWordCountersUsingForkJoinBookTextParser},
