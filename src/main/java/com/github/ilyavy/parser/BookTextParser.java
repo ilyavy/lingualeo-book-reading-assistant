@@ -148,7 +148,5 @@ public abstract class BookTextParser {
 
         List<String> sentences = bookParser.parseTextIntoSentences(text);
         Map<String, Word> wordsMap = bookParser.countWords(sentences);
-
-        System.out.println(wordsMap.values());
     }
 }

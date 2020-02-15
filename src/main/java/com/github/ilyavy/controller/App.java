@@ -19,6 +19,8 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -28,6 +30,9 @@ import reactor.core.scheduler.Schedulers;
  * CONTROLLER
  */
 public class App extends Application {
+
+    private static final Logger logger = LoggerFactory.getLogger(App.class);
+
     private LingualeoApi leo;
 
     private View view;
@@ -68,6 +73,8 @@ public class App extends Application {
 
         browser.setPrefSize(3000, 3000);
         browser.requestFocus();
+
+        logger.info("Application has started");
     }
 
     public static void main(String[] args) {
@@ -86,9 +93,9 @@ public class App extends Application {
                         try {
                             view.showUserProfile(profile);
                         } catch (View.ViewInteractionException e) {
-                            e.printStackTrace();
+                            logger.error("Showing user profile error", e);
                         }
-                    }, Throwable::printStackTrace);
+                    }, e -> logger.error("Login error", e));
 
             view.showLoading();
         }
@@ -135,7 +142,7 @@ public class App extends Application {
                     .subscribeOn(Schedulers.single())
                     .subscribe(
                             wordsList -> view.showWords(wordsList, 1),
-                            Throwable::printStackTrace); // TODO: substitute with logging, add error window
+                            e -> logger.error("Book parsing error", e)); // TODO: add error window
 
             view.showLoading();
         }
@@ -156,9 +163,9 @@ public class App extends Application {
                     .subscribe(tuple -> {
                                 int indexToRemove = (int) (tuple.getT2().getId() - tuple.getT1());
                                 words.remove(indexToRemove);
-                                System.out.println(tuple.getT2().getWord() + " - word is added");  // TODO: log
+                                logger.debug("{} - word is added", tuple.getT2().getWord());
                             },
-                            Throwable::printStackTrace,
+                            e -> logger.error("Adding words to the dictionary error", e),
                             () -> view.showWords(words, view.getCurrentPage()));
 
             view.showLoading();

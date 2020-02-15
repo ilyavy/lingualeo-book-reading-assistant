@@ -20,6 +20,8 @@ import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
@@ -28,6 +30,8 @@ import org.w3c.dom.events.EventTarget;
  * A {@link View} based on {@link WebView} JavaFx element. All the content is shown using JavaFx {@link WebEngine}.
  */
 class WebEngineView implements View {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebEngineView.class);
 
     private WebEngine webEngine;
 
@@ -63,7 +67,6 @@ class WebEngineView implements View {
             var profileStr = objectMapper.writeValueAsString(profile);
             Platform.runLater(() -> webEngine.executeScript("showProfileInfo(" + profileStr + ")"));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
             throw new ViewInteractionException(e);
         }
     }
@@ -90,7 +93,7 @@ class WebEngineView implements View {
                         + (words.size() / ITEMS_ON_PAGE) + ")");
 
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                logger.error("Showing words error", e);
             }
         });
 
@@ -113,7 +116,7 @@ class WebEngineView implements View {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Reading template error", e);
         }
 
         return result.toString();
@@ -126,7 +129,6 @@ class WebEngineView implements View {
             return Arrays.asList(objectMapper.readValue(wordsToAddStr, SimpleWord[].class));
 
         } catch (JsonProcessingException e) {
-            e.printStackTrace(); // TODO: log
             throw new ViewInteractionException(e);
         }
     }
@@ -188,7 +190,7 @@ class WebEngineView implements View {
                 URL url = new URL(evt.getCurrentTarget().toString());
                 Desktop.getDesktop().browse(url.toURI());
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Going to external resources error", e);
             }
         }
     }
