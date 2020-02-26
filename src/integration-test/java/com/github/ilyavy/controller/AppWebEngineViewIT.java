@@ -88,7 +88,7 @@ class AppWebEngineViewIT {
                 .setExpLevel(1)
                 .setHungryPct(1)
                 .setNickname("nickname")
-                .setUserId(1000)
+                .setId(1000)
                 .setWordsCount(10)
                 .setWordsKnown(50);
 

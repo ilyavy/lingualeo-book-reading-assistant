@@ -54,6 +54,15 @@ class WebEngineView implements View {
     }
 
     @Override
+    public void doOnReady(Runnable runnable) {
+        webEngine.getLoadWorker().stateProperty().addListener((ov, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                new Thread(runnable).start();
+            }
+        });
+    }
+
+    @Override
     public void showLoading() {
         Platform.runLater(() -> webEngine.executeScript("showWelcomeScreen();" +
                 "document.getElementById('profile_info').style.display = 'none'; " +
