@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class LingualeoProfile {
 
     @JsonProperty("user_id")
-    private int userId;
+    private int id;
 
     private String nickname;
 
@@ -26,12 +26,12 @@ public class LingualeoProfile {
     @JsonProperty("words_known")
     private int wordsKnown;
 
-    public int getUserId() {
-        return userId;
+    public int getId() {
+        return id;
     }
 
-    public LingualeoProfile setUserId(int userId) {
-        this.userId = userId;
+    public LingualeoProfile setId(int id) {
+        this.id = id;
         return this;
     }
 
@@ -81,6 +81,15 @@ public class LingualeoProfile {
     }
 
     @Override
+    public String toString() {
+        return "LingualeoProfile{" +
+                "id=" + id +
+                ", nickname='" + nickname + '\'' +
+                ", expLevel=" + expLevel +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -89,7 +98,7 @@ public class LingualeoProfile {
             return false;
         }
         LingualeoProfile that = (LingualeoProfile) obj;
-        return userId == that.userId &&
+        return id == that.id &&
                 expLevel == that.expLevel &&
                 hungryPct == that.hungryPct &&
                 wordsCount == that.wordsCount &&
@@ -99,6 +108,6 @@ public class LingualeoProfile {
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, nickname, expLevel, hungryPct, wordsCount, wordsKnown);
+        return Objects.hash(id, nickname, expLevel, hungryPct, wordsCount, wordsKnown);
     }
 }

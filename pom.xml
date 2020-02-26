@@ -22,7 +22,7 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
-        <checkstyle-plugin.version>3.1.0</checkstyle-plugin.version>
+        <checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
         <checkstyle.url>https://raw.githubusercontent.com/ilyavy/checkstyle/master/checkstyle.xml</checkstyle.url>
         <jacoco-plugin.version>0.8.5</jacoco-plugin.version>
 
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.3.2.RELEASE</version>
+            <version>3.3.3.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -83,7 +83,18 @@
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
-            <version>0.9.4.RELEASE</version>
+            <version>0.9.5.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-r2dbc</artifactId>
+            <version>1.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>io.r2dbc</groupId>
+            <artifactId>r2dbc-h2</artifactId>
+            <version>0.8.2.RELEASE</version>
         </dependency>
 
         <!-- Json -->
@@ -132,7 +143,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.2.4</version>
+            <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -299,7 +310,7 @@
                     <linkXRef>false</linkXRef>
 
                     <!-- Files, which contain experimental Java features -->
-                    <excludes>**/WebEngineView.java</excludes>
+                    <excludes>**/WebEngineView.java,**/LingualeoApi.java</excludes>
                 </configuration>
             </plugin>
 

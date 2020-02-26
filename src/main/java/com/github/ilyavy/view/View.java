@@ -14,6 +14,12 @@ import javafx.scene.web.WebView;
 public interface View {
 
     /**
+     * Provides callback on the change of the view's state to 'ready', when it is built and shown to a user.
+     * @param runnable runnable to call at the change to 'ready' state
+     */
+    void doOnReady(Runnable runnable);
+
+    /**
      * Shows loading screen.
      */
     void showLoading();

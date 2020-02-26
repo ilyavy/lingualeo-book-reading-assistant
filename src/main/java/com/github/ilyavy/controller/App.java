@@ -33,11 +33,15 @@ public class App extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(App.class);
 
-    private LingualeoApi leo;
+    private LingualeoApi leoApi;
 
     private View view;
 
     private WebView browser;
+
+    // Volatile is set here to insure that when the reference is updated with a new list,
+    // it becomes visible for all the threads, the list is supposed to be changed only in 'batch' mode, as a whole.
+    private volatile List<? extends Word> words;
 
     WebView getBrowser() {
         return browser;
@@ -47,11 +51,9 @@ public class App extends Application {
         return view;
     }
 
-    private volatile List<? extends Word> words;
-
     @Override
-    public void start(Stage stage) throws Exception {
-        leo = new LingualeoApi();
+    public void start(Stage stage) {
+        leoApi = new LingualeoApi();
         browser = new WebView();
 
         view = View.from(browser)
@@ -75,6 +77,10 @@ public class App extends Application {
         browser.requestFocus();
 
         logger.info("Application has started");
+
+        if (leoApi.isUserAuthenticated()) {
+            view.doOnReady(() -> view.showUserProfile(leoApi.getLingualeoProfile()));
+        }
     }
 
     public static void main(String[] args) {
@@ -87,8 +93,7 @@ public class App extends Application {
     protected class ButtonLoginHandler implements Runnable {
         @Override
         public void run() {
-            leo.login(view.getLogin(), view.getPassword())
-                    .subscribeOn(Schedulers.single())
+            leoApi.login(view.getLogin(), view.getPassword())
                     .subscribe(profile -> {
                         try {
                             view.showUserProfile(profile);
@@ -156,8 +161,8 @@ public class App extends Application {
         public void run() {
             Mono.fromCallable(() -> view.getSelectedWords())
                     .flatMapMany(Flux::fromIterable)
-                    .concatMap(leo::requestAndSetTranslation)
-                    .concatMap(leo::addWordToDictionary)
+                    .concatMap(leoApi::requestAndSetTranslation)
+                    .concatMap(leoApi::addWordToDictionary)
                     .index()
                     .subscribeOn(Schedulers.single())
                     .subscribe(tuple -> {
