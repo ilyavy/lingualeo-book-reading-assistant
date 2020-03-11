@@ -16,7 +16,7 @@
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <!-- Dependencies -->
-        <javafx.version>13.0.2</javafx.version>
+        <javafx.version>14</javafx.version>
 
         <!-- Plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
