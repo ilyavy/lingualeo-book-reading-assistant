@@ -90,7 +90,7 @@
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
-            <version>0.9.9.RELEASE</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
