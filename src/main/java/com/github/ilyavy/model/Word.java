@@ -152,11 +152,12 @@ public abstract class Word implements Comparable<Word> {
 
     @Override
     public boolean equals(final Object obj) {
-        if (!(obj instanceof Word)) {
+        // TODO: java15 preview feature
+        if (obj instanceof Word that) {
+            return word.equals(that.word);
+        } else {
             return false;
         }
-        Word that = (Word) obj;
-        return word.equals(that.word);
     }
 
     @Override

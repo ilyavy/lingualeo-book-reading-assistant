@@ -8,22 +8,22 @@
     <name>English Book Reading Assistant</name>
 
     <properties>
-        <maven.compiler.source>14</maven.compiler.source>
-        <maven.compiler.target>14</maven.compiler.target>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
 
         <sonar.projectKey>ilyavy_lingualeo-book-reading-assistant</sonar.projectKey>
         <sonar.organization>ilyavy</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <!-- Dependencies -->
-        <javafx.version>14.0.1</javafx.version>
-        <jackson.version>2.11.0</jackson.version>
+        <javafx.version>15.0.1</javafx.version>
+        <jackson.version>2.12.1</jackson.version>
         <logback.version>1.3.0-alpha5</logback.version>
 
         <!-- Test Dependencies -->
         <junit-jupiter.version>5.7.0</junit-jupiter.version>
         <testfx.version>4.0.16-alpha</testfx.version>
-        <jmh.version>1.23</jmh.version>
+        <jmh.version>1.27</jmh.version>
 
         <!-- Plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -31,7 +31,7 @@
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
         <checkstyle.url>https://raw.githubusercontent.com/ilyavy/checkstyle/master/checkstyle.xml</checkstyle.url>
-        <jacoco-plugin.version>0.8.5</jacoco-plugin.version>
+        <jacoco-plugin.version>0.8.6</jacoco-plugin.version>
 
         <sonar.exclusions>**/model/api/*.java,**Launcher.java,**/parser/*.java</sonar.exclusions>
         <itest-name-template>**/*IT.java</itest-name-template>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.4.1</version>
+            <version>3.4.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </dependency>
 
         <dependency>
@@ -101,7 +101,7 @@
         <dependency>
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-h2</artifactId>
-            <version>0.8.3.RELEASE</version>
+            <version>0.8.4.RELEASE</version>
         </dependency>
 
         <!-- Json -->
@@ -150,7 +150,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.6.28</version>
+            <version>3.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -309,21 +309,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${checkstyle-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>8.39</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <configLocation>${checkstyle.url}</configLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
-
-                    <excludes>
-                        <!-- Files, which contain experimental Java features -->
-                        **/LingualeoApi.java,
-
-                        <!-- Files, which contain features that are not experimental anymore but
-                        still are not supported by Checkctyle-->
-                        **/WebEngineView.java
-                    </excludes>
                 </configuration>
             </plugin>
 
