@@ -46,6 +46,18 @@
     </distributionManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>4.2.0</version>
+            <classifier>models</classifier>
+        </dependency>
+
         <!-- JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -96,7 +108,7 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-r2dbc</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>io.r2dbc</groupId>
@@ -150,7 +162,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.7.0</version>
+            <version>3.7.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -199,8 +211,8 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgument>--enable-preview</compilerArgument>
-                    <source>${maven.compiler.target}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>15</source>
+                    <target>15</target>
 
                     <!-- Workaround for IDEA Java preview features bug -->
                     <compilerArgs>
