@@ -27,6 +27,7 @@ public abstract class BookTextParser {
      */
     protected static final int WORD_LENGTH_THRESHOLD = 3;
 
+    protected Lemmatizer lemmatizer;
 
     /**
      * The default constructor.
@@ -36,9 +37,15 @@ public abstract class BookTextParser {
     }
 
     /**
+     * The constructor with the specified Lemmatizer.
+     */
+    public BookTextParser(Lemmatizer lemmatizer) {
+        this.lemmatizer = lemmatizer;
+    }
+
+    /**
      * Returns the list of strings, each of which is a sentence
      * from the provided text.
-     *
      * @param text text to analyze.
      * @return list of sentences.
      */
@@ -100,7 +107,6 @@ public abstract class BookTextParser {
 
     /**
      * Returns is a given char symbol a vowel or not.
-     *
      * @param letter provided char symbol
      * @return boolean: false or true.
      */
@@ -122,23 +128,21 @@ public abstract class BookTextParser {
     }
 
     protected Map<String, Word> parseSentence(final String sentence, final Map<String, Word> wordsMap) {
-        Pattern splitter = Pattern.compile(PATTERN);
-        Matcher matcher = splitter.matcher(sentence);
-
-        while (matcher.find()) {
-            String wordStr = matcher.group().toLowerCase();
-            if (wordStr.length() > WORD_LENGTH_THRESHOLD) {
-                Word word = wordsMap.merge(wordStr, new SimpleWord(wordStr, sentence), (w1, w2) -> w1);
-                word.incrementCount();
-            }
-        }
+        lemmatizer.lemmatize(sentence)
+                .forEach(w -> {
+                    Word word = wordsMap.merge(
+                            w,
+                            new SimpleWord(w, sentence),
+                            (w1, w2) -> w1
+                    );
+                    word.incrementCount();
+                });
 
         return wordsMap;
     }
 
     /**
      * Debug method.
-     *
      * @throws IOException by book parser
      *                     TODO: remove
      */

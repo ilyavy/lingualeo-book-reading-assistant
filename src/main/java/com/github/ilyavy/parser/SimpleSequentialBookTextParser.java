@@ -11,6 +11,14 @@ import com.github.ilyavy.model.Word;
  */
 public class SimpleSequentialBookTextParser extends BookTextParser {
 
+    public SimpleSequentialBookTextParser() {
+        super();
+    }
+
+    public SimpleSequentialBookTextParser(Lemmatizer lemmatizer) {
+        super(lemmatizer);
+    }
+
     @Override
     public Map<String, Word> countWords(final List<String> sentences) {
         Map<String, Word> wordsMap = new HashMap<>();
