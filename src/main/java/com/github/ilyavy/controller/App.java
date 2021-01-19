@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import com.github.ilyavy.model.Word;
 import com.github.ilyavy.parser.BookTextParser;
+import com.github.ilyavy.parser.Lemmatizer;
 import com.github.ilyavy.parser.SimpleSequentialBookTextParser;
 import com.github.ilyavy.reader.BookFileReader;
 import com.github.ilyavy.view.View;
@@ -135,8 +137,13 @@ public class App extends Application {
                 BookFileReader reader = BookFileReader.createInstance(new File(selectedFile.getAbsolutePath()));
                 BookTextParser parser = new SimpleSequentialBookTextParser();
 
-                List<String> sentences = parser.parseTextIntoSentences(reader.readIntoString());
-                var result = new ArrayList<>(parser.countWords(sentences).values());
+                Lemmatizer lemmatizer = new Lemmatizer();
+                List<String> lemmatizedSsentences = parser
+                        .parseTextIntoSentences(reader.readIntoString())
+                        .stream()
+                        .map(lemmatizer::lemmatize)
+                        .collect(Collectors.toList());
+                var result = new ArrayList<>(parser.countWords(lemmatizedSsentences).values());
                 result.sort(Comparator.comparingLong(Word::getCount).reversed());
                 words = result;
 
