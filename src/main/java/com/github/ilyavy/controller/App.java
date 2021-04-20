@@ -135,15 +135,11 @@ public class App extends Application {
 
             Callable<List<? extends Word>> parseBook = () -> {
                 BookFileReader reader = BookFileReader.createInstance(new File(selectedFile.getAbsolutePath()));
-                BookTextParser parser = new SimpleSequentialBookTextParser();
+                Lemmatizer lemmatizer = new Lemmatizer(); // todo: lazy creation? creation at startup?
+                BookTextParser parser = new SimpleSequentialBookTextParser(lemmatizer);
 
-                Lemmatizer lemmatizer = new Lemmatizer();
-                List<String> lemmatizedSsentences = parser
-                        .parseTextIntoSentences(reader.readIntoString())
-                        .stream()
-                        .map(lemmatizer::lemmatize)
-                        .collect(Collectors.toList());
-                var result = new ArrayList<>(parser.countWords(lemmatizedSsentences).values());
+                List<String> sentences = parser.parseTextIntoSentences(reader.readIntoString());
+                var result = new ArrayList<>(parser.countWords(sentences).values());
                 result.sort(Comparator.comparingLong(Word::getCount).reversed());
                 words = result;
 
