@@ -47,6 +47,7 @@ public class Lemmatizer {
                         "WDT,WP,WP$," + // wh-determiner (who), wh-pronoun (who, what, whom) and possessive wh-pronoun (whose)
                         "WRB" // wh-adverb
         );
+        props.setProperty("stopwords.checkOnlyLemmas", "false");
         props.setProperty("stopwords.customListResourcesFilePath", "stopwords.txt");
 
         this.pipeline = new StanfordCoreNLP(props);
