@@ -83,6 +83,10 @@ class WebEngineView implements View {
     @Override
     public void showWords(@Nonnull List<? extends Word> words, int page) {
         Platform.runLater(() -> {
+            if (words.isEmpty()) {
+                logger.error("Words list is empty"); // TODO: error window
+            }
+
             if (page < 1 || page > (int) Math.ceil((double) words.size() / ITEMS_ON_PAGE)) {
                 return;
             }
