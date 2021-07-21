@@ -1,15 +1,19 @@
 package com.github.ilyavy.controller;
 
+import com.github.ilyavy.model.Cookie;
 import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
 import com.github.ilyavy.model.api.LoginResponse;
 import com.github.ilyavy.model.api.TranslateResponse;
+import io.r2dbc.h2.H2ConnectionConfiguration;
+import io.r2dbc.h2.H2ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.r2dbc.core.DatabaseClient;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,6 +21,7 @@ import reactor.core.scheduler.Schedulers;
 
 import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 import static org.springframework.data.r2dbc.query.Criteria.where;
+import static org.springframework.data.relational.core.query.Query.query;
 
 /**
  * Wrapper around lingualeo.com API. Uses non-blocking communication with Lingualeo web-service,
@@ -38,7 +43,7 @@ public class LingualeoApi {
     /** An active user's profile. */
     private LingualeoProfile lingualeoProfile;
 
-    private DatabaseClient dbClient;
+    private R2dbcEntityTemplate dbTemplate;
 
     /**
      * Creates LingualeoApi object. If the persistence is not available due to access rights or some other reason,
@@ -47,39 +52,38 @@ public class LingualeoApi {
      */
     public LingualeoApi() {
         try {
-            ConnectionFactory connectionFactory = ConnectionFactories.get(ConnectionFactoryOptions.builder()
-                    .option(DRIVER, "h2")
-                    .option(PROTOCOL, "file")
-                    .option(DATABASE, PERSISTENCE_FILE)
+            H2ConnectionFactory connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
+                    .file(PERSISTENCE_FILE)
                     .build());
-            dbClient = DatabaseClient.create(connectionFactory);
+            logger.debug("-" + connectionFactory.getMetadata().getName() + "-");
+            dbTemplate = new R2dbcEntityTemplate(connectionFactory);
 
-            dbClient.execute("""
+            dbTemplate.getDatabaseClient().sql("""
                     CREATE TABLE IF NOT EXISTS lingualeo_profile
                     (id INT PRIMARY KEY, nickname VARCHAR(255), exp_level INT, hungry_pct INT,
                     words_count INT, words_known INT)
                     """)
                     .fetch()
                     .rowsUpdated()
-                    .then(dbClient.execute("""
+                    .then(dbTemplate.getDatabaseClient().sql("""
                             CREATE TABLE IF NOT EXISTS cookies
                             (id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, name VARCHAR(255), value VARCHAR(255));
                             ALTER TABLE cookies ADD FOREIGN KEY (user_id) REFERENCES lingualeo_profile(id);
                             """)
                             .fetch()
                             .rowsUpdated())
-                    .then(dbClient.select()
-                            .from(LingualeoProfile.class)
-                            .as(LingualeoProfile.class)
+                    .then(dbTemplate
+                            .select(LingualeoProfile.class)
                             .first())
                     .doOnSuccess(p -> lingualeoProfile = p)
-                    .flatMap(p -> dbClient.select()
+                    .flatMap(p -> dbTemplate
+                            .select(Cookie.class)
                             .from("cookies")
-                            .project("value")
-                            .matching(where("user_id").is(p.getId())
-                                    .and("name").is(COOKIE_NAME))
-                            .map((row, rowMetadata) -> row.get("value", String.class))
-                            .first())
+                            .matching(query(where("user_id").is(p.getId())
+                                    .and("name").is(COOKIE_NAME)))
+                            .first()
+                            .map(Cookie::getValue)
+                    )
                     .subscribe(v -> sessionCookie = v, e -> logger.error("Persistence is unavailable", e));
 
         } catch (Exception e) {
@@ -89,7 +93,6 @@ public class LingualeoApi {
 
     /**
      * Authenticate user, using his email and password, the call is not blocking and works in a separate thread.
-     *
      * @param email    - user's email
      * @param password - user's password. Should not be encrypted.
      * @return JsonObject, containing user's profile data.
@@ -115,21 +118,20 @@ public class LingualeoApi {
      * Persists the active (current) profile together with the session cookie, the call is non-blocking.
      */
     void persistProfile() {
-        dbClient.select()
-                .from(LingualeoProfile.class)
-                .matching(where("id").is(lingualeoProfile.getId()))
-                .fetch()
+        dbTemplate.select(LingualeoProfile.class)
+                //.from(LingualeoProfile.class)
+                .matching(query(where("id").is(lingualeoProfile.getId())))
+                //.fetch()
                 .first()
-                .switchIfEmpty(dbClient.insert()
-                        .into(LingualeoProfile.class)
+                .switchIfEmpty(dbTemplate
+                        .insert(LingualeoProfile.class)
+                        //.into(LingualeoProfile.class)
                         .using(lingualeoProfile)
                         .then()
                         .map(v -> lingualeoProfile))
-                .flatMap(ignored -> dbClient.insert()
-                        .into("COOKIES")
-                        .value("user_id", lingualeoProfile.getId())
-                        .value("name", COOKIE_NAME)
-                        .value("value", sessionCookie)
+                .flatMap(ignored -> dbTemplate
+                        .insert(Cookie.class)
+                        .using(new Cookie(lingualeoProfile.getId(), COOKIE_NAME, sessionCookie))
                         .then())
                 .subscribeOn(Schedulers.single())
                 .subscribe(ignored -> logger.info(
@@ -139,7 +141,6 @@ public class LingualeoApi {
 
     /**
      * Checks if the active user is authenticated already.
-     *
      * @return boolean true - if authenticated, false - otherwise
      */
     public boolean isUserAuthenticated() {
@@ -148,7 +149,6 @@ public class LingualeoApi {
 
     /**
      * Returns a lingualeo profile of the active user.
-     *
      * @return Lingualeo profile
      */
     public LingualeoProfile getLingualeoProfile() {
@@ -157,7 +157,6 @@ public class LingualeoApi {
 
     /**
      * Returns a translation of the specified word, the call is non-blocking.
-     *
      * @param word word to translate
      * @return Mono of the word with the translation
      */
@@ -176,7 +175,6 @@ public class LingualeoApi {
 
     /**
      * Adds the specified word with a translation and a context into user's dictionary, the call is non-blocking.
-     *
      * @param word word to add to a dictionary
      */
     public Mono<Word> addWordToDictionary(Word word) {
