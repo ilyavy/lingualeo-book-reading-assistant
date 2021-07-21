@@ -7,19 +7,14 @@ import com.github.ilyavy.model.api.LoginResponse;
 import com.github.ilyavy.model.api.TranslateResponse;
 import io.r2dbc.h2.H2ConnectionConfiguration;
 import io.r2dbc.h2.H2ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactories;
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
-import org.springframework.data.relational.core.dialect.Dialect;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import static io.r2dbc.spi.ConnectionFactoryOptions.*;
 import static org.springframework.data.r2dbc.query.Criteria.where;
 import static org.springframework.data.relational.core.query.Query.query;
 
