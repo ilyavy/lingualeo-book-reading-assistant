@@ -77,7 +77,7 @@ public class LingualeoApi {
                             .matching(query(where("user_id").is(p.getId())
                                     .and("name").is(COOKIE_NAME)))
                             .first()
-                            .map(Cookie::getValue)
+                            .map(Cookie::value)
                     )
                     .subscribe(v -> sessionCookie = v, e -> logger.error("Persistence is unavailable", e));
 

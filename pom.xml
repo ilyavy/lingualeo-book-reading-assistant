@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>jila.lingualeo</groupId>
     <artifactId>lingualeo-book-reading-assistant</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>English Book Reading Assistant</name>
 
     <properties>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
 
         <sonar.projectKey>ilyavy_lingualeo-book-reading-assistant</sonar.projectKey>
         <sonar.organization>ilyavy</sonar.organization>
@@ -17,7 +17,7 @@
 
         <!-- Dependencies -->
         <javafx.version>16</javafx.version>
-        <jackson.version>2.12.1</jackson.version>
+        <jackson.version>2.12.4</jackson.version>
         <logback.version>1.3.0-alpha5</logback.version>
 
         <!-- Test Dependencies -->
@@ -29,9 +29,9 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
-        <checkstyle-plugin.version>3.1.1</checkstyle-plugin.version>
+        <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
         <checkstyle.url>https://raw.githubusercontent.com/ilyavy/checkstyle/master/checkstyle.xml</checkstyle.url>
-        <jacoco-plugin.version>0.8.6</jacoco-plugin.version>
+        <jacoco-plugin.version>0.8.7</jacoco-plugin.version>
 
         <sonar.exclusions>**/model/api/*.java,**Launcher.java,**/parser/*.java</sonar.exclusions>
         <itest-name-template>**/*IT.java</itest-name-template>
@@ -111,7 +111,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
-            <version>5.2.3.RELEASE</version>
+            <version>5.3.9</version>
         </dependency>
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
@@ -235,8 +235,8 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgument>--enable-preview</compilerArgument>
-                    <source>15</source>
-                    <target>15</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
 
                     <!-- Workaround for IDEA Java preview features bug -->
                     <compilerArgs>
