@@ -44,7 +44,8 @@ public class Lemmatizer {
                         "EX," + // existential there
                         "POS," + // possessive ending: 's
                         "SYM," + // symbol
-                        "WDT,WP,WP$," + // wh-determiner (who), wh-pronoun (who, what, whom) and possessive wh-pronoun (whose)
+                        // wh-determiner (who), wh-pronoun (who, what, whom) and possessive wh-pronoun (whose)
+                        "WDT,WP,WP$," +
                         "WRB" // wh-adverb
         );
         props.setProperty("stopwords.checkOnlyLemmas", "false");
@@ -53,6 +54,11 @@ public class Lemmatizer {
         this.pipeline = new StanfordCoreNLP(props);
     }
 
+    /**
+     * Splits provided String into words, returns the list of lemaas of those words.
+     * @param text  String to be lemmatized
+     * @return  the list of lemmas of words in the provided String
+     */
     public List<String> lemmatize(String text) {
         Annotation document = new Annotation(text);
         this.pipeline.annotate(document);

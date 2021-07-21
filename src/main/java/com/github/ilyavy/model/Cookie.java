@@ -1,16 +1,25 @@
 package com.github.ilyavy.model;
 
+/**
+ * Representation of cookie returned by LinguaLeo API.
+ */
 public class Cookie {
     private int id;
-    private int user_id;
+    private int userId;
     private String name;
     private String value;
 
     public Cookie() {
     }
 
-    public Cookie(int user_id, String name, String value) {
-        this.user_id = user_id;
+    /**
+     * Creates new cookie with the provided parameters.
+     * @param userId user's id
+     * @param name name
+     * @param value the value of cookie (returned by LinguaLeo API)
+     */
+    public Cookie(int userId, String name, String value) {
+        this.userId = userId;
         this.name = name;
         this.value = value;
     }
@@ -24,12 +33,12 @@ public class Cookie {
         return this;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public Cookie setUser_id(int user_id) {
-        this.user_id = user_id;
+    public Cookie setUserId(int userId) {
+        this.userId = userId;
         return this;
     }
 
