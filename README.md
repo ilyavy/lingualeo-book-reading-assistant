@@ -36,7 +36,7 @@ java --enable-preview -jar lingualeo-book-reading-assistant.jar
 ## Project's structure
 ```
 ├── src
-    └── main      # source-set of the application
+    ├── main      # source-set of the application
     └── perf      # source-set of the performance benchmark
 └── book-samples  # books samples
 ```
