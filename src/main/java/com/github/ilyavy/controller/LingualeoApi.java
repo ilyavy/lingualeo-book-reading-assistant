@@ -45,6 +45,7 @@ public class LingualeoApi {
      * the constructor will not fail, it will just make a record to the log and continue work without persistence.
      * The work of the constructor is blocking.
      */
+    // todo: why LingualeoApi is responsible for persistence?!
     public LingualeoApi() {
         try {
             H2ConnectionFactory connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
@@ -61,9 +62,10 @@ public class LingualeoApi {
                     .fetch()
                     .rowsUpdated()
                     .then(dbTemplate.getDatabaseClient().sql("""
-                            CREATE TABLE IF NOT EXISTS cookies
-                            (id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, name VARCHAR(255), value VARCHAR(255));
-                            ALTER TABLE cookies ADD FOREIGN KEY (user_id) REFERENCES lingualeo_profile(id);
+                            CREATE TABLE IF NOT EXISTS cookie
+                            (user_id INT, name VARCHAR(255), value VARCHAR(255),
+                            PRIMARY KEY(user_id, name));
+                            ALTER TABLE cookie ADD FOREIGN KEY (user_id) REFERENCES lingualeo_profile(id);
                             """)
                             .fetch()
                             .rowsUpdated())
@@ -73,11 +75,11 @@ public class LingualeoApi {
                     .doOnSuccess(p -> lingualeoProfile = p)
                     .flatMap(p -> dbTemplate
                             .select(Cookie.class)
-                            .from("cookies")
+                            .from("cookie")
                             .matching(query(where("user_id").is(p.getId())
                                     .and("name").is(COOKIE_NAME)))
                             .first()
-                            .map(Cookie::value)
+                            .map(Cookie::getValue)
                     )
                     .subscribe(v -> sessionCookie = v, e -> logger.error("Persistence is unavailable", e));
 
@@ -106,7 +108,8 @@ public class LingualeoApi {
                 .flatMap(response -> response.bodyToMono(LoginResponse.class))
                 .map(LoginResponse::getUser)
                 .doOnSuccess(p -> lingualeoProfile = p)
-                .doOnSuccess(p -> persistProfile());
+                .doOnSuccess(p -> persistProfile())
+                .doOnSuccess(p -> persistCookie(p, sessionCookie));
     }
 
     /**
@@ -114,24 +117,32 @@ public class LingualeoApi {
      */
     void persistProfile() {
         dbTemplate.select(LingualeoProfile.class)
-                //.from(LingualeoProfile.class)
                 .matching(query(where("id").is(lingualeoProfile.getId())))
-                //.fetch()
                 .first()
                 .switchIfEmpty(dbTemplate
                         .insert(LingualeoProfile.class)
-                        //.into(LingualeoProfile.class)
                         .using(lingualeoProfile)
                         .then()
                         .map(v -> lingualeoProfile))
-                .flatMap(ignored -> dbTemplate
+                .flatMap(ignored -> dbTemplate // todo: cookie is not persisted when profile is persisted first time
                         .insert(Cookie.class)
                         .using(new Cookie(lingualeoProfile.getId(), COOKIE_NAME, sessionCookie))
                         .then())
                 .subscribeOn(Schedulers.single())
                 .subscribe(ignored -> logger.info(
-                        "The user's `{}` lingualeo profile and the session cookie are persisted", lingualeoProfile),
+                        "The user's `{}` lingualeo profile is persisted", lingualeoProfile),
                         e -> logger.error("The user's profile cannot be persisted", e));
+    }
+
+    void persistCookie(LingualeoProfile profile, String cookieValue) {
+        dbTemplate
+                .insert(Cookie.class)
+                .using(new Cookie(profile.getId(), COOKIE_NAME, cookieValue))
+                .then()
+                .subscribeOn(Schedulers.single())
+                .subscribe(ignored -> logger.info(
+                        "The user's `{}` session cookie is persisted", lingualeoProfile),
+                        e -> logger.error("The user's cookie cannot be persisted", e));
     }
 
     /**
