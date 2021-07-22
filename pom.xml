@@ -45,14 +45,6 @@
         </repository>
     </distributionManagement>
 
-    <!-- To use stop words annotator todo: remove after its release to maven central -->
-    <repositories>
-        <repository>
-            <id>github-stopwords</id>
-            <url>https://maven.pkg.github.com/pepperkit/corenlp-stop-words-annotator</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- Core NLP -->
         <dependency>

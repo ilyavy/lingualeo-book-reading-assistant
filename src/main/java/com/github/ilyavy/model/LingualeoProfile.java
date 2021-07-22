@@ -3,16 +3,18 @@ package com.github.ilyavy.model;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.data.annotation.Id;
 
 /**
  * A representation of Lingualeo profile.
  */
 public class LingualeoProfile {
 
+    @Id
     @JsonProperty("user_id")
     private int id;
 
-    private String nickname;
+    private String nickname = "";
 
     @JsonProperty("xp_level")
     private int expLevel;
@@ -28,6 +30,9 @@ public class LingualeoProfile {
 
     public int getId() {
         return id;
+    }
+
+    public LingualeoProfile() {
     }
 
     public LingualeoProfile setId(int id) {
