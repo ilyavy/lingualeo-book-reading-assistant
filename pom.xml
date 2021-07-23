@@ -4,8 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>jila.lingualeo</groupId>
     <artifactId>lingualeo-book-reading-assistant</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <name>English Book Reading Assistant</name>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.3</version>
+    </parent>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -62,6 +68,12 @@
             <groupId>io.github.pepperkit</groupId>
             <artifactId>corenlp-stop-words-annotator</artifactId>
             <version>0.9.0</version>
+        </dependency>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
 
         <!-- JavaFX -->
@@ -143,24 +155,6 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.0-alpha2</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-
 
         <!-- Testing -->
         <dependency>

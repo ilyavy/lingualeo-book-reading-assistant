@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
 import com.github.ilyavy.parser.BookTextParser;
 import com.github.ilyavy.parser.Lemmatizer;
@@ -37,6 +39,8 @@ public class App extends Application {
 
     private LingualeoApi leoApi;
 
+    private UserDataDao dao;
+
     private View view;
 
     private WebView browser;
@@ -55,9 +59,26 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) {
-        leoApi = new LingualeoApi();
-        browser = new WebView();
+        AtomicReference<LingualeoProfile> lingualeoProfile = new AtomicReference<>();
+        AtomicReference<String> sessionCookie = new AtomicReference<>();
 
+        /* If the persistence is not available due to access rights or some other reason,
+        the code will not fail, it will just make a record to the log and continue work without persistence.
+        The work of this part is blocking. */
+        dao = new UserDataDao();
+        dao.initializeTablesIfNecessary()
+                .then(dao.getUserProfile()) // todo: for now only one active profile is supported
+                .doOnSuccess(lingualeoProfile::set)
+                .flatMap(p -> dao.getCookie(p.getId(), LingualeoApi.COOKIE_NAME))
+                .subscribe(sessionCookie::set, e -> logger.error("Persistence is unavailable", e));
+
+        if (lingualeoProfile.get() != null && sessionCookie.get() != null) { // todo: check the cookie for validity?
+            leoApi = new LingualeoApi(lingualeoProfile.get(), sessionCookie.get());
+        } else {
+            leoApi = new LingualeoApi();
+        }
+
+        browser = new WebView();
         view = View.from(browser)
                 .setEventHandler(ViewEvent.LOGIN, new ButtonLoginHandler())
                 .setEventHandler(ViewEvent.ANALYZE_BOOK, new ButtonAnalyzeHandler(stage))
@@ -98,6 +119,9 @@ public class App extends Application {
         @Override
         public void run() {
             leoApi.login(view.getLogin(), view.getPassword())
+                    .doOnSuccess(profile -> dao.persistProfile(profile))
+                    .doOnSuccess(profile ->
+                            dao.persistCookie(profile, LingualeoApi.COOKIE_NAME, leoApi.getSessionCookie()))
                     .subscribe(profile -> {
                         try {
                             view.showUserProfile(profile);
