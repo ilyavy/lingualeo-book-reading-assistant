@@ -1,13 +1,12 @@
 package com.github.ilyavy;
 
 import com.github.ilyavy.controller.App;
+import javafx.application.Application;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Launcher is used as a workaround in order to not require javafx runtime installed on the target machine.
- * {@see https://github.com/javafxports/openjdk-jfx/issues/236}
- */
+@SpringBootApplication
 public class Launcher {
     public static void main(String[] args) {
-        App.main(new String[0]);
+        Application.launch(App.class);
     }
 }

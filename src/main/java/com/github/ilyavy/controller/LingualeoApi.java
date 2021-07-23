@@ -1,91 +1,50 @@
 package com.github.ilyavy.controller;
 
-import com.github.ilyavy.model.Cookie;
 import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
 import com.github.ilyavy.model.api.LoginResponse;
 import com.github.ilyavy.model.api.TranslateResponse;
-import io.r2dbc.h2.H2ConnectionConfiguration;
-import io.r2dbc.h2.H2ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import static org.springframework.data.r2dbc.query.Criteria.where;
-import static org.springframework.data.relational.core.query.Query.query;
 
 /**
  * Wrapper around lingualeo.com API. Uses non-blocking communication with Lingualeo web-service,
  * some responses can be cached.
  */
+@Component
 public class LingualeoApi {
 
     private static final Logger logger = LoggerFactory.getLogger(LingualeoApi.class);
 
-    private static final String PERSISTENCE_FILE = "~/book-reading-assistant/localdata";
-
     private static final String BASE_URL = "https://api.lingualeo.com/";
 
     /** The name of the cookie, responsible for a user's session. */
-    private static final String COOKIE_NAME = "remember";
+    public static final String COOKIE_NAME = "remember";
 
     private volatile String sessionCookie;
 
     /** An active user's profile. */
     private LingualeoProfile lingualeoProfile;
 
-    private R2dbcEntityTemplate dbTemplate;
+    /**
+     * Creates LingualeoApi object.
+     */
+    public LingualeoApi() {
+
+    }
 
     /**
-     * Creates LingualeoApi object. If the persistence is not available due to access rights or some other reason,
-     * the constructor will not fail, it will just make a record to the log and continue work without persistence.
-     * The work of the constructor is blocking.
+     * Creates LingualeoApi object with the specified parameters.
+     * @param lingualeoProfile previously persisted user's profile
+     * @param sessionCookie user's session cookie
      */
-    // todo: why LingualeoApi is responsible for persistence?!
-    public LingualeoApi() {
-        try {
-            H2ConnectionFactory connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
-                    .file(PERSISTENCE_FILE)
-                    .build());
-            logger.debug("-" + connectionFactory.getMetadata().getName() + "-");
-            dbTemplate = new R2dbcEntityTemplate(connectionFactory);
-
-            dbTemplate.getDatabaseClient().sql("""
-                    CREATE TABLE IF NOT EXISTS lingualeo_profile
-                    (id INT PRIMARY KEY, nickname VARCHAR(255), exp_level INT, hungry_pct INT,
-                    words_count INT, words_known INT)
-                    """)
-                    .fetch()
-                    .rowsUpdated()
-                    .then(dbTemplate.getDatabaseClient().sql("""
-                            CREATE TABLE IF NOT EXISTS cookie
-                            (user_id INT, name VARCHAR(255), value VARCHAR(255),
-                            PRIMARY KEY(user_id, name));
-                            ALTER TABLE cookie ADD FOREIGN KEY (user_id) REFERENCES lingualeo_profile(id);
-                            """)
-                            .fetch()
-                            .rowsUpdated())
-                    .then(dbTemplate
-                            .select(LingualeoProfile.class)
-                            .first())
-                    .doOnSuccess(p -> lingualeoProfile = p)
-                    .flatMap(p -> dbTemplate
-                            .select(Cookie.class)
-                            .from("cookie")
-                            .matching(query(where("user_id").is(p.getId())
-                                    .and("name").is(COOKIE_NAME)))
-                            .first()
-                            .map(Cookie::getValue)
-                    )
-                    .subscribe(v -> sessionCookie = v, e -> logger.error("Persistence is unavailable", e));
-
-        } catch (Exception e) {
-            logger.error("Cannot open persistence file {}", PERSISTENCE_FILE, e);
-        }
+    public LingualeoApi(LingualeoProfile lingualeoProfile, String sessionCookie) {
+        this.lingualeoProfile = lingualeoProfile;
+        this.sessionCookie = sessionCookie;
     }
 
     /**
@@ -107,42 +66,7 @@ public class LingualeoApi {
                 .doOnSuccess(response -> sessionCookie = response.cookies().getFirst(COOKIE_NAME).getValue())
                 .flatMap(response -> response.bodyToMono(LoginResponse.class))
                 .map(LoginResponse::getUser)
-                .doOnSuccess(p -> lingualeoProfile = p)
-                .doOnSuccess(p -> persistProfile())
-                .doOnSuccess(p -> persistCookie(p, sessionCookie));
-    }
-
-    /**
-     * Persists the active (current) profile together with the session cookie, the call is non-blocking.
-     */
-    void persistProfile() {
-        dbTemplate.select(LingualeoProfile.class)
-                .matching(query(where("id").is(lingualeoProfile.getId())))
-                .first()
-                .switchIfEmpty(dbTemplate
-                        .insert(LingualeoProfile.class)
-                        .using(lingualeoProfile)
-                        .then()
-                        .map(v -> lingualeoProfile))
-                .flatMap(ignored -> dbTemplate // todo: cookie is not persisted when profile is persisted first time
-                        .insert(Cookie.class)
-                        .using(new Cookie(lingualeoProfile.getId(), COOKIE_NAME, sessionCookie))
-                        .then())
-                .subscribeOn(Schedulers.single())
-                .subscribe(ignored -> logger.info(
-                        "The user's `{}` lingualeo profile is persisted", lingualeoProfile),
-                        e -> logger.error("The user's profile cannot be persisted", e));
-    }
-
-    void persistCookie(LingualeoProfile profile, String cookieValue) {
-        dbTemplate
-                .insert(Cookie.class)
-                .using(new Cookie(profile.getId(), COOKIE_NAME, cookieValue))
-                .then()
-                .subscribeOn(Schedulers.single())
-                .subscribe(ignored -> logger.info(
-                        "The user's `{}` session cookie is persisted", lingualeoProfile),
-                        e -> logger.error("The user's cookie cannot be persisted", e));
+                .doOnSuccess(p -> lingualeoProfile = p);
     }
 
     /**
@@ -159,6 +83,10 @@ public class LingualeoApi {
      */
     public LingualeoProfile getLingualeoProfile() {
         return lingualeoProfile;
+    }
+
+    public String getSessionCookie() {
+        return sessionCookie;
     }
 
     /**
