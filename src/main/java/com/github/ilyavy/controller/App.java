@@ -14,6 +14,7 @@ import com.github.ilyavy.reader.BookFileReader;
 import com.github.ilyavy.view.View;
 import com.github.ilyavy.view.ViewEvent;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
@@ -84,8 +85,10 @@ public class App extends Application {
         }
     }
 
-    public static void main(String[] args) {
-        launch();
+    @Override
+    public void stop() {
+        logger.info("Application is closed");
+        Platform.exit();
     }
 
     /**
