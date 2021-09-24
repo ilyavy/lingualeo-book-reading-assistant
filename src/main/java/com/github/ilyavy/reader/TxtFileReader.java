@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * Reads files in plain text format with the extension ".txt".
  */
-class TxtFileReader extends BookFileReader {
+final class TxtFileReader extends BookFileReader {
 
     TxtFileReader(final File bookFile) {
         super(bookFile);
