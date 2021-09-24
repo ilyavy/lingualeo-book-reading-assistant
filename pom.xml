@@ -10,33 +10,33 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.3</version>
+        <version>2.5.5</version>
     </parent>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <sonar.projectKey>ilyavy_lingualeo-book-reading-assistant</sonar.projectKey>
         <sonar.organization>ilyavy</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
         <!-- Dependencies -->
-        <javafx.version>17</javafx.version>
-        <jackson.version>2.12.4</jackson.version>
+        <javafx.version>17.0.0.1</javafx.version>
+        <jackson.version>2.12.5</jackson.version>
         <logback.version>1.3.0-alpha5</logback.version>
 
         <!-- Test Dependencies -->
         <junit-jupiter.version>5.8.0</junit-jupiter.version>
         <testfx.version>4.0.16-alpha</testfx.version>
-        <jmh.version>1.32</jmh.version>
+        <jmh.version>1.33</jmh.version>
 
         <!-- Plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
-        <checkstyle.url>https://raw.githubusercontent.com/ilyavy/checkstyle/master/checkstyle.xml</checkstyle.url>
+        <checkstyle.url>https://raw.githubusercontent.com/pepperkit/checkstyle/v1.0.0-9.0/checkstyle.xml</checkstyle.url>
         <jacoco-plugin.version>0.8.7</jacoco-plugin.version>
 
         <sonar.exclusions>**/model/api/*.java,**Launcher.java,**/parser/*.java</sonar.exclusions>
@@ -110,28 +110,28 @@
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
-            <version>3.4.8</version>
+            <version>3.4.10</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
-            <version>5.3.9</version>
+            <version>5.3.10</version>
         </dependency>
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
-            <version>1.0.9</version>
+            <version>1.0.11</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-r2dbc</artifactId>
-            <version>1.3.3</version>
+            <version>1.3.5</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
-            <version>5.3.9</version>
+            <version>5.3.10</version>
         </dependency>
         <dependency>
             <groupId>io.r2dbc</groupId>
@@ -178,7 +178,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.20.2</version>
+            <version>3.21.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -221,13 +221,11 @@
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <compilerArgument>--enable-preview</compilerArgument>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>17</source>
+                    <target>17</target>
 
                     <!-- Workaround for IDEA Java preview features bug -->
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
+                    <compilerArgs>--enable-preview</compilerArgs>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                 </configuration>
             </plugin>
@@ -335,7 +333,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.39</version>
+                        <version>9.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
