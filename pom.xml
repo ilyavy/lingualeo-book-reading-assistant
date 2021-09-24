@@ -14,8 +14,8 @@
     </parent>
 
     <properties>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <sonar.projectKey>ilyavy_lingualeo-book-reading-assistant</sonar.projectKey>
         <sonar.organization>ilyavy</sonar.organization>
