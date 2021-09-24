@@ -7,7 +7,7 @@ import java.io.IOException;
  * Abstract file reader with static factory to create a concrete instance.
  * Supported formats: plain text (.txt).
  */
-public sealed abstract class BookFileReader permits TxtFileReader {
+public abstract sealed class BookFileReader permits TxtFileReader {
 
     File bookFile;
 
