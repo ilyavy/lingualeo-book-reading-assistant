@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
-import com.github.ilyavy.parser.word.SimpleWord;
+import com.github.ilyavy.service.parser.word.SimpleWord;
 import com.github.ilyavy.view.View;
 import javafx.application.Platform;
 import javafx.stage.Stage;

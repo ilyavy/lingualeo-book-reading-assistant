@@ -15,7 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
-import com.github.ilyavy.parser.word.SimpleWord;
+import com.github.ilyavy.service.parser.word.SimpleWord;
 import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.scene.web.WebEngine;

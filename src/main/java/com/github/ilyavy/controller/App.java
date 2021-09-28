@@ -9,10 +9,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
-import com.github.ilyavy.parser.BookTextParser;
-import com.github.ilyavy.parser.Lemmatizer;
-import com.github.ilyavy.parser.SimpleSequentialBookTextParser;
-import com.github.ilyavy.reader.BookFileReader;
+import com.github.ilyavy.service.LingualeoApi;
+import com.github.ilyavy.service.UserDataDao;
+import com.github.ilyavy.service.parser.BookTextParser;
+import com.github.ilyavy.service.parser.Lemmatizer;
+import com.github.ilyavy.service.parser.SimpleSequentialBookTextParser;
+import com.github.ilyavy.service.reader.BookFileReader;
 import com.github.ilyavy.view.View;
 import com.github.ilyavy.view.ViewEvent;
 import javafx.application.Application;
