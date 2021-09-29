@@ -4,6 +4,7 @@ import com.github.ilyavy.model.Cookie;
 import com.github.ilyavy.model.LingualeoProfile;
 import io.r2dbc.h2.H2ConnectionConfiguration;
 import io.r2dbc.h2.H2ConnectionFactory;
+import io.r2dbc.spi.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
@@ -29,7 +30,7 @@ public class UserDataDao {
      * @return just Mono to continue the pipeline
      */
     public Mono<?> initializeTablesIfNecessary() {
-        H2ConnectionFactory connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
+        ConnectionFactory connectionFactory = new H2ConnectionFactory(H2ConnectionConfiguration.builder()
                 .file(PERSISTENCE_FILE)
                 .build());
         logger.debug("-" + connectionFactory.getMetadata().getName() + "-");
