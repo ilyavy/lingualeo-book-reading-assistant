@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
+import com.github.ilyavy.service.UserDataDao;
 import com.github.ilyavy.service.parser.word.SimpleWord;
 import com.github.ilyavy.view.View;
 import javafx.application.Platform;
@@ -17,9 +18,9 @@ import org.testfx.framework.junit5.Start;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ApplicationExtension.class)
-class AppWebEngineViewIT {
+class JavaFxAppWebEngineViewIT {
 
-    private App app;
+    private JavaFxApp javaFxApp;
 
     private final Object javaFxSyncLock = new Object();
 
@@ -28,7 +29,7 @@ class AppWebEngineViewIT {
             Runnable assertion = () -> {
                 synchronized (javaFxSyncLock) {
                     try {
-                        var display = (String) app.getBrowser().getEngine()
+                        var display = (String) javaFxApp.getBrowser().getEngine()
                                 .executeScript("document.getElementById('" + elementId + "').style.display");
                         assertEquals(visibility, display, "'" + elementId + "' display property's value");
                     } finally {
@@ -46,7 +47,7 @@ class AppWebEngineViewIT {
             Runnable assertion = () -> {
                 synchronized (javaFxSyncLock) {
                     try {
-                        var actualValue = (String) app.getBrowser().getEngine()
+                        var actualValue = (String) javaFxApp.getBrowser().getEngine()
                                 .executeScript("document.getElementById('" + elementId + "').innerHTML");
                         assertEquals(expectedValue, actualValue, "'" + elementId + "' value");
                     } finally {
@@ -70,13 +71,14 @@ class AppWebEngineViewIT {
 
     @Start
     private void start(Stage stage) throws Exception {
-        app = new App();
-        app.start(stage);
+        javaFxApp = new JavaFxApp();
+        javaFxApp.dao = new UserDataDao();
+        javaFxApp.start(stage);
     }
 
     @Test
     void viewShowLoading() throws InterruptedException {
-        app.getView().showLoading();
+        javaFxApp.getView().showLoading();
 
         checkElementDisplayProperty("words", "none");
         checkElementDisplayProperty("auth_loading", "block");
@@ -92,7 +94,7 @@ class AppWebEngineViewIT {
                 .setWordsCount(10)
                 .setWordsKnown(50);
 
-        app.getView().showUserProfile(profile);
+        javaFxApp.getView().showUserProfile(profile);
 
         checkElementDisplayProperty("auth", "none");
         checkElementDisplayProperty("profile_info", "table");
@@ -109,7 +111,7 @@ class AppWebEngineViewIT {
                 .setTranslate("тестовое слово")
                 .setContext("This is a testword");
 
-        app.getView().showWords(List.of(word), 1);
+        javaFxApp.getView().showWords(List.of(word), 1);
 
         checkElementDisplayProperty("words", "block");
         checkElementDisplayProperty("welcome_screen", "none");

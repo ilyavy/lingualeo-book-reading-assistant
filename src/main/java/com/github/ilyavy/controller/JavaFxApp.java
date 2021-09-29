@@ -27,29 +27,42 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Entry point for a GUI-rich application.
  * CONTROLLER
  */
-public class App extends Application {
+@Component
+public class JavaFxApp extends Application {
 
-    private static final Logger logger = LoggerFactory.getLogger(App.class);
+    private static final Logger logger = LoggerFactory.getLogger(JavaFxApp.class);
 
     private LingualeoApi leoApi;
 
-    private UserDataDao dao;
+    protected UserDataDao dao;
 
     private View view;
 
     private WebView browser;
 
-    // Volatile is set here to insure that when the reference is updated with a new list,
+    // Volatile is set here to ensure that when the reference is updated with a new list,
     // it becomes visible for all the threads, the list is supposed to be changed only in 'batch' mode, as a whole.
     private volatile List<? extends Word> words;
+
+    public JavaFxApp() {
+    }
+
+    @Autowired
+    public JavaFxApp(UserDataDao dao) {
+        this.dao = dao;
+    }
 
     WebView getBrowser() {
         return browser;
@@ -57,6 +70,11 @@ public class App extends Application {
 
     View getView() {
         return view;
+    }
+
+    @PostConstruct
+    public void runJavaFxApp() {
+        Application.launch(JavaFxApp.class);
     }
 
     @Override
@@ -67,7 +85,6 @@ public class App extends Application {
         /* If the persistence is not available due to access rights or some other reason,
         the code will not fail, it will just make a record to the log and continue work without persistence.
         The work of this part is blocking. */
-        dao = new UserDataDao();
         dao.initializeTablesIfNecessary()
                 .then(dao.getUserProfile()) // todo: for now only one active profile is supported
                 .doOnSuccess(lingualeoProfile::set)
