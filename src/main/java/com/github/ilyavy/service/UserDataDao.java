@@ -8,6 +8,7 @@ import io.r2dbc.spi.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -17,6 +18,7 @@ import static org.springframework.data.relational.core.query.Query.query;
 /**
  * Data layer for the access to user's info persisted to the DB.
  */
+@Service
 public class UserDataDao {
 
     private static final Logger logger = LoggerFactory.getLogger(UserDataDao.class);
