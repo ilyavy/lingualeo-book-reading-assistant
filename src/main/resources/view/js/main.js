@@ -131,7 +131,7 @@ function printEntitiesList(template, arr, curPage, amountOfPages) {
 	let text = "";
     for(let i = 0; i < arr.length; i++) {
             obj = arr[i];
-            if (obj != null) {
+            if (obj !== null) {
             	let row = template;
             	console.log(template);
             	row = row.replace(/%-id-%/g, "wc_" + obj.id);
