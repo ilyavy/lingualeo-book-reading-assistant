@@ -1,4 +1,4 @@
-package com.github.ilyavy.service;
+package com.github.ilyavy.dao;
 
 import com.github.ilyavy.model.Cookie;
 import com.github.ilyavy.model.LingualeoProfile;
@@ -40,7 +40,7 @@ public class UserDataDao {
 
         return dbTemplate.getDatabaseClient().sql("""
                     CREATE TABLE IF NOT EXISTS lingualeo_profile
-                    (id INT PRIMARY KEY, nickname VARCHAR(255), exp_level INT, hungry_pct INT,
+                    (id INT PRIMARY KEY AUTO_INCREMENT, nickname VARCHAR(255), exp_level INT, hungry_pct INT,
                     words_count INT, words_known INT)
                     """)
                 .fetch()

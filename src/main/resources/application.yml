@@ -1,0 +1,6 @@
+spring:
+  main:
+    web-application-type: none
+
+  r2dbc:
+    url: r2dbc:h2:file:///~/book-reading-assistant/localdata;DB_CLOSE_DELAY=-1

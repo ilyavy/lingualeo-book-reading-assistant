@@ -27,5 +27,6 @@
     </root>
 
     <logger name="javafx" level="WARN" />
+    <logger name="org.springframework" level="WARN" />
     <logger name="io.netty" level="WARN" />
 </configuration>

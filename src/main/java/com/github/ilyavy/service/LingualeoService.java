@@ -7,7 +7,6 @@ import com.github.ilyavy.model.lingualeo.api.TranslateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -15,10 +14,10 @@ import reactor.core.publisher.Mono;
  * Wrapper around lingualeo.com API. Uses non-blocking communication with Lingualeo web-service,
  * some responses can be cached.
  */
-@Component
-public class LingualeoApi {
 
-    private static final Logger logger = LoggerFactory.getLogger(LingualeoApi.class);
+public class LingualeoService {
+
+    private static final Logger logger = LoggerFactory.getLogger(LingualeoService.class);
 
     private static final String BASE_URL = "https://api.lingualeo.com/";
 
@@ -33,7 +32,7 @@ public class LingualeoApi {
     /**
      * Creates LingualeoApi object.
      */
-    public LingualeoApi() {
+    public LingualeoService() {
 
     }
 
@@ -42,7 +41,7 @@ public class LingualeoApi {
      * @param lingualeoProfile previously persisted user's profile
      * @param sessionCookie user's session cookie
      */
-    public LingualeoApi(LingualeoProfile lingualeoProfile, String sessionCookie) {
+    public LingualeoService(LingualeoProfile lingualeoProfile, String sessionCookie) {
         this.lingualeoProfile = lingualeoProfile;
         this.sessionCookie = sessionCookie;
     }
