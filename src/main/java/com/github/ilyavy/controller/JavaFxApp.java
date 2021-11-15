@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
 
-import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
-import com.github.ilyavy.service.LingualeoApi;
-import com.github.ilyavy.service.UserDataDao;
+import com.github.ilyavy.service.LingualeoService;
+import com.github.ilyavy.service.UserService;
 import com.github.ilyavy.service.parser.BookTextParser;
 import com.github.ilyavy.service.parser.Lemmatizer;
 import com.github.ilyavy.service.parser.SimpleSequentialBookTextParser;
@@ -28,25 +26,25 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Entry point for a GUI-rich application.
  * CONTROLLER
  */
 @Component
+@DependsOn("lingualeoService")
 public class JavaFxApp extends Application {
 
     private static final Logger logger = LoggerFactory.getLogger(JavaFxApp.class);
 
-    private LingualeoApi leoApi;
+    protected static LingualeoService lingualeoService;
 
-    protected UserDataDao dao;
+    protected static UserService userService;
 
     private View view;
 
@@ -60,8 +58,9 @@ public class JavaFxApp extends Application {
     }
 
     @Autowired
-    public JavaFxApp(UserDataDao dao) {
-        this.dao = dao;
+    public JavaFxApp(UserService userService, LingualeoService lingualeoService) {
+        JavaFxApp.userService = userService;
+        JavaFxApp.lingualeoService = lingualeoService;
     }
 
     WebView getBrowser() {
@@ -72,31 +71,8 @@ public class JavaFxApp extends Application {
         return view;
     }
 
-    @PostConstruct
-    public void runJavaFxApp() {
-        Application.launch(JavaFxApp.class);
-    }
-
     @Override
     public void start(Stage stage) {
-        AtomicReference<LingualeoProfile> lingualeoProfile = new AtomicReference<>();
-        AtomicReference<String> sessionCookie = new AtomicReference<>();
-
-        /* If the persistence is not available due to access rights or some other reason,
-        the code will not fail, it will just make a record to the log and continue work without persistence.
-        The work of this part is blocking. */
-        dao.initializeTablesIfNecessary()
-                .then(dao.getUserProfile()) // todo: for now only one active profile is supported
-                .doOnSuccess(lingualeoProfile::set)
-                .flatMap(p -> dao.getCookie(p.getId(), LingualeoApi.COOKIE_NAME))
-                .subscribe(sessionCookie::set, e -> logger.error("Persistence is unavailable", e));
-
-        if (lingualeoProfile.get() != null && sessionCookie.get() != null) { // todo: check the cookie for validity?
-            leoApi = new LingualeoApi(lingualeoProfile.get(), sessionCookie.get());
-        } else {
-            leoApi = new LingualeoApi();
-        }
-
         browser = new WebView();
         view = View.from(browser)
                 .setEventHandler(ViewEvent.LOGIN, new ButtonLoginHandler())
@@ -120,8 +96,8 @@ public class JavaFxApp extends Application {
 
         logger.info("Application has started");
 
-        if (leoApi.isUserAuthenticated()) {
-            view.doOnReady(() -> view.showUserProfile(leoApi.getLingualeoProfile()));
+        if (lingualeoService.isUserAuthenticated()) {
+            view.doOnReady(() -> view.showUserProfile(lingualeoService.getLingualeoProfile()));
         }
     }
 
@@ -137,10 +113,10 @@ public class JavaFxApp extends Application {
     protected class ButtonLoginHandler implements Runnable {
         @Override
         public void run() {
-            leoApi.login(view.getLogin(), view.getPassword())
-                    .doOnSuccess(profile -> dao.persistProfile(profile))
-                    .doOnSuccess(profile ->
-                            dao.persistCookie(profile, LingualeoApi.COOKIE_NAME, leoApi.getSessionCookie()))
+            lingualeoService.login(view.getLogin(), view.getPassword())
+                    .doOnSuccess(profile -> userService.persistProfile(profile))
+                    .doOnSuccess(profile -> userService
+                            .persistCookie(profile, LingualeoService.COOKIE_NAME, lingualeoService.getSessionCookie()))
                     .subscribe(profile -> {
                         try {
                             view.showUserProfile(profile);
@@ -209,8 +185,8 @@ public class JavaFxApp extends Application {
         public void run() {
             Mono.fromCallable(() -> view.getSelectedWords())
                     .flatMapMany(Flux::fromIterable)
-                    .concatMap(leoApi::requestAndSetTranslation)
-                    .concatMap(leoApi::addWordToDictionary)
+                    .concatMap(lingualeoService::requestAndSetTranslation)
+                    .concatMap(lingualeoService::addWordToDictionary)
                     .index()
                     .subscribeOn(Schedulers.single())
                     .subscribe(tuple -> {

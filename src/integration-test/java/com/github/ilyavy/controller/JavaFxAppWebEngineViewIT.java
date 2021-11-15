@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.github.ilyavy.model.LingualeoProfile;
 import com.github.ilyavy.model.Word;
-import com.github.ilyavy.service.UserDataDao;
+import com.github.ilyavy.dao.UserDataDao;
+import com.github.ilyavy.service.LingualeoService;
+import com.github.ilyavy.service.UserService;
 import com.github.ilyavy.service.parser.word.SimpleWord;
 import com.github.ilyavy.view.View;
 import javafx.application.Platform;
@@ -72,7 +74,8 @@ class JavaFxAppWebEngineViewIT {
     @Start
     private void start(Stage stage) throws Exception {
         javaFxApp = new JavaFxApp();
-        javaFxApp.dao = new UserDataDao();
+        javaFxApp.userService = new UserService(null, null);
+        javaFxApp.lingualeoService = new LingualeoService();
         javaFxApp.start(stage);
     }
 

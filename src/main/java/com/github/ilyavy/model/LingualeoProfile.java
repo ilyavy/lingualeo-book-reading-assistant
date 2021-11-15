@@ -3,14 +3,13 @@ package com.github.ilyavy.model;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.data.annotation.Id;
+
 
 /**
  * A representation of Lingualeo profile.
  */
 public class LingualeoProfile {
 
-    @Id
     @JsonProperty("user_id")
     private int id;
 
