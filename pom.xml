@@ -67,7 +67,7 @@
         <dependency>
             <groupId>io.github.pepperkit</groupId>
             <artifactId>corenlp-stop-words-annotator</artifactId>
-            <version>0.9.0</version>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- Spring Boot -->
