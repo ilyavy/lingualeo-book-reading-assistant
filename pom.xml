@@ -57,12 +57,12 @@
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
-            <version>4.3.1</version>
+            <version>4.3.2</version>
         </dependency>
         <dependency>
             <groupId>edu.stanford.nlp</groupId>
             <artifactId>stanford-corenlp</artifactId>
-            <version>4.3.1</version>
+            <version>4.3.2</version>
             <classifier>models</classifier>
         </dependency>
         <dependency>
@@ -79,12 +79,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.6</version>
+            <version>1.2.7</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.2.6</version>
+            <version>1.2.7</version>
         </dependency>
 
         <!-- JavaFX -->
@@ -191,7 +191,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -428,7 +428,7 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.7</version>
+                <version>0.0.8</version>
                 <configuration>
                     <mainClass>com.github.ilyavy.Launcher</mainClass>
                 </configuration>
