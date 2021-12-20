@@ -24,7 +24,7 @@
 
         <!-- Dependencies -->
         <javafx.version>17.0.1</javafx.version>
-        <jackson.version>2.13.0</jackson.version>
+        <jackson.version>2.13.1</jackson.version>
         <logback.version>1.3.0-alpha5</logback.version>
 
         <!-- Test Dependencies -->
