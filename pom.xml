@@ -33,7 +33,7 @@
         <jmh.version>1.34</jmh.version>
 
         <!-- Plugins -->
-        <maven-compiler-plugin.version>3.9.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.10.0</maven-compiler-plugin.version>
         <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
