@@ -136,7 +136,7 @@
         <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty</artifactId>
-            <version>1.1.4</version>
+            <version>1.1.7</version>
         </dependency>
 
         <!-- Persistence -->
