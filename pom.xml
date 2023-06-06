@@ -38,7 +38,7 @@
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <checkstyle-plugin.version>3.1.2</checkstyle-plugin.version>
         <checkstyle.url>https://raw.githubusercontent.com/pepperkit/checkstyle/v1.0.1-9.1/checkstyle.xml</checkstyle.url>
-        <jacoco-plugin.version>0.8.7</jacoco-plugin.version>
+        <jacoco-plugin.version>0.8.10</jacoco-plugin.version>
 
         <sonar.exclusions>**/model/api/*.java,**Launcher.java,**/parser/*.java</sonar.exclusions>
         <itest-name-template>**/*IT.java</itest-name-template>
